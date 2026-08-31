@@ -13,16 +13,19 @@ try {
   console.error("Erreur lors de l'initialisation de Supabase :", e);
 }
 
-// Clé secrète administrateur
-const CLE_ADMIN_SECRETE = "DDJDYGDMTB"; 
 let currentMode = 'student';
 
-// Structure de données globale par filière (BAPES et 6 semestres)
+// Structure de données globale par filière (BAPES, 6 semestres, publication et étudiants)
 let donneesActuelles = {
   structureUEParNiveau: {
     "BAPES 1": { "Semestre 1": [], "Semestre 2": [] },
     "BAPES 2": { "Semestre 3": [], "Semestre 4": [] },
     "BAPES 3": { "Semestre 5": [], "Semestre 6": [] }
+  },
+  publicationSemestres: {
+    "BAPES 1": { "Semestre 1": false, "Semestre 2": false },
+    "BAPES 2": { "Semestre 3": false, "Semestre 4": false },
+    "BAPES 3": { "Semestre 5": false, "Semestre 6": false }
   },
   etudiants: []
 };
@@ -55,7 +58,7 @@ if (btnModeStudent) {
     document.getElementById('adminPanelContainer').style.display = 'none';
     document.getElementById('saveChangesBtn').style.display = 'none';
     document.getElementById('bulletinContainer').style.display = 'none';
-    afficherErreurMatricule(''); // Nettoyer les erreurs en changeant de mode
+    afficherErreurMatricule(''); 
   });
 }
 
@@ -68,11 +71,10 @@ const adminModalSubmit = document.getElementById('adminModalSubmit');
 
 if (btnAdminMode && adminModal) {
   btnAdminMode.addEventListener('click', () => {
-    // Affichage du modal personnalisé à la place du prompt() natif
     adminModal.style.display = 'flex';
-    adminKeyInput.value = '';
-    adminModalError.style.display = 'none';
-    adminKeyInput.focus();
+    if (adminKeyInput) adminKeyInput.value = '';
+    if (adminModalError) adminModalError.style.display = 'none';
+    if (adminKeyInput) adminKeyInput.focus();
   });
 }
 
@@ -85,13 +87,28 @@ if (adminModalCancel) {
   });
 }
 
-// Validation de la clé dans le modal Admin personnalisé
+// Validation de l'authentification sécurisée via Supabase Auth
 if (adminModalSubmit) {
   adminModalSubmit.addEventListener('click', async () => {
     try {
-      const saisieCle = adminKeyInput.value.trim();
+      // Récupération de l'e-mail (s'il existe dans le modal HTML) ou valeur par défaut
+      const emailInput = document.getElementById('adminEmailInput');
+      const emailAdmin = emailInput ? emailInput.value.trim() : "admin@bapes.bj";
+      const passwordAdmin = adminKeyInput ? adminKeyInput.value.trim() : "";
 
-      if (saisieCle === CLE_ADMIN_SECRETE) {
+      // Appel sécurisé à Supabase Auth
+      const { data, error } = await _supabase.auth.signInWithPassword({
+        email: emailAdmin,
+        password: passwordAdmin,
+      });
+
+      if (error || !data.session) {
+        if (adminModalError) {
+          adminModalError.textContent = "Identifiants administrateur incorrects !";
+          adminModalError.style.display = 'block';
+        }
+        if (adminKeyInput) adminKeyInput.focus();
+      } else {
         currentMode = 'admin';
         adminModal.style.display = 'none';
         
@@ -106,18 +123,14 @@ if (adminModalSubmit) {
         
         await chargerDonneesDepuisSupabase();
         chargerInterfaceAdmin();
-      } else {
-        adminModalError.textContent = "Clé d'accès incorrecte !";
-        adminModalError.style.display = 'block';
-        adminKeyInput.focus();
       }
     } catch (err) {
-      console.error("Erreur mode admin :", err);
+      console.error("Erreur d'authentification :", err);
     }
   });
 }
 
-// Permettre la validation par la touche "Entrée" dans l'input de la clé admin
+// Permettre la validation par la touche "Entrée"
 if (adminKeyInput) {
   adminKeyInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -161,6 +174,11 @@ async function chargerDonneesDepuisSupabase() {
           "BAPES 2": { "Semestre 3": [], "Semestre 4": [] },
           "BAPES 3": { "Semestre 5": [], "Semestre 6": [] }
         },
+        publicationSemestres: {
+          "BAPES 1": { "Semestre 1": false, "Semestre 2": false },
+          "BAPES 2": { "Semestre 3": false, "Semestre 4": false },
+          "BAPES 3": { "Semestre 5": false, "Semestre 6": false }
+        },
         etudiants: []
       };
     } else {
@@ -170,6 +188,13 @@ async function chargerDonneesDepuisSupabase() {
           "BAPES 1": { "Semestre 1": [], "Semestre 2": [] },
           "BAPES 2": { "Semestre 3": [], "Semestre 4": [] },
           "BAPES 3": { "Semestre 5": [], "Semestre 6": [] }
+        };
+      }
+      if (!donneesActuelles.publicationSemestres) {
+        donneesActuelles.publicationSemestres = {
+          "BAPES 1": { "Semestre 1": false, "Semestre 2": false },
+          "BAPES 2": { "Semestre 3": false, "Semestre 4": false },
+          "BAPES 3": { "Semestre 5": false, "Semestre 6": false }
         };
       }
       if (!donneesActuelles.etudiants) donneesActuelles.etudiants = [];
@@ -278,17 +303,34 @@ function chargerListeEtudiantsAdmin() {
 
 window.modifierEtudiant = async function(index) {
   const etudiant = donneesActuelles.etudiants[index];
-  const nouveauNom = prompt(`Modifier le nom et prénoms pour l'étudiant (${etudiant.matricule}) :`, etudiant.nom);
   
+  const nouveauMatricule = prompt(`Modifier le matricule pour l'étudiant :`, etudiant.matricule);
+  if (nouveauMatricule === null) return; 
+  const matriculeNettoye = nouveauMatricule.trim();
+  
+  if (!matriculeNettoye) {
+    alert("Le matricule ne peut pas être vide.");
+    return;
+  }
+
+  const doublon = donneesActuelles.etudiants.some((e, i) => i !== index && e.matricule.toLowerCase() === matriculeNettoye.toLowerCase());
+  if (doublon) {
+    alert("Un autre étudiant possède déjà ce matricule dans cette filière.");
+    return;
+  }
+
+  const nouveauNom = prompt(`Modifier le nom et prénoms pour l'étudiant (${matriculeNettoye}) :`, etudiant.nom);
   if (nouveauNom === null) return; 
-  
   const nomNettoye = nouveauNom.trim();
+  
   if (!nomNettoye) {
     alert("Le nom ne peut pas être vide.");
     return;
   }
 
+  donneesActuelles.etudiants[index].matricule = matriculeNettoye;
   donneesActuelles.etudiants[index].nom = nomNettoye;
+  
   await sauvegarderDonneesVersSupabase();
   chargerListeEtudiantsAdmin();
 };
@@ -299,10 +341,11 @@ window.supprimerEtudiant = async function(index) {
   chargerListeEtudiantsAdmin();
 };
 
-// --- 4. CONFIGURATION DE LA MAQUETTE PÉDAGOGIQUE ---
+// --- 4. CONFIGURATION DE LA MAQUETTE PÉDAGOGIQUE ET TABLEAU DE BORD STATS ---
 function chargerInterfaceAdmin() {
   chargerInterfaceBuilder();
   chargerListeEtudiantsAdmin();
+  calculerEtAfficherStatistiquesAdmin();
 }
 
 function chargerInterfaceBuilder() {
@@ -321,8 +364,36 @@ function chargerInterfaceBuilder() {
     donneesActuelles.structureUEParNiveau[annee][semestre] = [];
   }
 
-  const uesActuelles = donneesActuelles.structureUEParNiveau[annee][semestre];
+  if (!donneesActuelles.publicationSemestres) donneesActuelles.publicationSemestres = {};
+  if (!donneesActuelles.publicationSemestres[annee]) donneesActuelles.publicationSemestres[annee] = {};
+  
+  let estPublie = !!donneesActuelles.publicationSemestres[annee][semestre];
 
+  // Option de publication
+  const publicationBox = document.createElement('div');
+  publicationBox.className = 'publication-control-box';
+  publicationBox.style.cssText = "background:var(--bg-card); padding:1rem; border-radius:8px; margin-bottom:1rem; border:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;";
+  publicationBox.innerHTML = `
+    <div>
+      <strong style="display:block; font-size:0.95rem;">Publication des résultats (${semestre} - ${annee})</strong>
+      <span style="font-size:0.8rem; color:var(--text-muted);">Cochez cette case pour rendre les résultats visibles aux étudiants après la délibération.</span>
+    </div>
+    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600;">
+      <input type="checkbox" id="checkboxPublicationSemestre" ${estPublie ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;">
+      Publier les résultats
+    </label>
+  `;
+  container.appendChild(publicationBox);
+
+  const checkboxPub = publicationBox.querySelector('#checkboxPublicationSemestre');
+  checkboxPub.addEventListener('change', (e) => {
+    if (!donneesActuelles.publicationSemestres[annee]) {
+      donneesActuelles.publicationSemestres[annee] = {};
+    }
+    donneesActuelles.publicationSemestres[annee][semestre] = e.target.checked;
+  });
+
+  const uesActuelles = donneesActuelles.structureUEParNiveau[annee][semestre];
   uesActuelles.forEach((ue, ueIndex) => {
     ajouterLigneUEBuilder(ue, ueIndex);
   });
@@ -435,6 +506,105 @@ function capturerDonneesBuilderEnCours() {
   const semestre = document.getElementById('semestreSelect').value;
   if (!donneesActuelles.structureUEParNiveau[annee]) donneesActuelles.structureUEParNiveau[annee] = {};
   donneesActuelles.structureUEParNiveau[annee][semestre] = nouvelleStructure;
+
+  const checkboxPub = document.getElementById('checkboxPublicationSemestre');
+  if (checkboxPub) {
+    if (!donneesActuelles.publicationSemestres) donneesActuelles.publicationSemestres = {};
+    if (!donneesActuelles.publicationSemestres[annee]) donneesActuelles.publicationSemestres[annee] = {};
+    donneesActuelles.publicationSemestres[annee][semestre] = checkboxPub.checked;
+  }
+}
+
+// Fonction de calcul des statistiques pour le tableau de bord administrateur
+function calculerEtAfficherStatistiquesAdmin() {
+  const annee = document.getElementById('anneeSelect').value;
+  const semestre = document.getElementById('semestreSelect').value;
+  const structureSemestre = donneesActuelles.structureUEParNiveau?.[annee]?.[semestre] || [];
+  const etudiants = donneesActuelles.etudiants || [];
+
+  if (etudiants.length === 0 || structureSemestre.length === 0) {
+    supprimerBlocStatsIfExists();
+    return;
+  }
+
+  let totalEtudiantsEvalues = 0;
+  let totalAdmis = 0;
+  let sommeMoyennesClasse = 0;
+  const totalSemestreCredits = 30;
+
+  etudiants.forEach(etudiant => {
+    const notesSemestre = etudiant.notes?.[annee]?.[semestre] || {};
+    const nombreNotes = Object.keys(notesSemestre).length;
+    
+    if (nombreNotes > 0) {
+      totalEtudiantsEvalues++;
+      let totalCreditsAcquis = 0;
+      let totalWeightedScores = 0;
+
+      structureSemestre.forEach(ue => {
+        let sommeNotesUE = 0;
+        ue.ecs.forEach(ec => {
+          sommeNotesUE += notesSemestre[ec.nom] !== undefined ? notesSemestre[ec.nom] : 0;
+        });
+
+        let moyenneUE = ue.ecs.length > 0 ? sommeNotesUE / ue.ecs.length : 0;
+        if (moyenneUE >= 10) totalCreditsAcquis += ue.credit;
+        totalWeightedScores += moyenneUE * ue.credit;
+      });
+
+      let moyenneSemestrielle = totalWeightedScores / totalSemestreCredits;
+      sommeMoyennesClasse += moyenneSemestrielle;
+
+      if (totalCreditsAcquis >= 24 && moyenneSemestrielle >= 10) {
+        totalAdmis++;
+      }
+    }
+  });
+
+  const moyenneGeneralePromotion = totalEtudiantsEvalues > 0 ? (sommeMoyennesClasse / totalEtudiantsEvalues).toFixed(2) : "0.00";
+  const tauxReussite = totalEtudiantsEvalues > 0 ? ((totalAdmis / totalEtudiantsEvalues) * 100).toFixed(1) : "0.0";
+
+  afficherOuMettreAJourBlocStats({
+    total: totalEtudiantsEvalues,
+    admis: totalAdmis,
+    taux: tauxReussite,
+    moyenne: moyenneGeneralePromotion
+  });
+}
+
+function afficherOuMettreAJourBlocStats(stats) {
+  let statsContainer = document.getElementById('adminStatsDashboard');
+  
+  if (!statsContainer) {
+    statsContainer = document.createElement('div');
+    statsContainer.id = 'adminStatsDashboard';
+    statsContainer.style.cssText = "display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;";
+    
+    const adminPanel = document.getElementById('adminPanelContainer');
+    if (adminPanel) {
+      adminPanel.insertBefore(statsContainer, adminPanel.firstChild);
+    }
+  }
+
+  statsContainer.innerHTML = `
+    <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+      <span style="display:block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Évalués</span>
+      <strong style="font-size: 1.25rem;">${stats.total}</strong>
+    </div>
+    <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+      <span style="display:block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Taux de réussite</span>
+      <strong style="font-size: 1.25rem; color: #10b981;">${stats.taux}%</strong>
+    </div>
+    <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+      <span style="display:block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Moyenne de classe</span>
+      <strong style="font-size: 1.25rem;">${stats.moyenne}/20</strong>
+    </div>
+  `;
+}
+
+function supprimerBlocStatsIfExists() {
+  const statsContainer = document.getElementById('adminStatsDashboard');
+  if (statsContainer) statsContainer.remove();
 }
 
 // --- 5. CONSULTATION ET SAISIE DES NOTES ---
@@ -460,7 +630,6 @@ if (actionBtn) {
       return;
     }
 
-    // Effacer le message d'erreur si l'étudiant est bien trouvé
     afficherErreurMatricule("");
 
     const anneeKey = document.getElementById('anneeSelect').value;
@@ -468,10 +637,28 @@ if (actionBtn) {
 
     const structureSemestre = donneesActuelles.structureUEParNiveau?.[anneeKey]?.[semestreKey] || [];
     if(structureSemestre.length === 0) {
-      // Remplacement de l'alerte par le message dynamique demandé
       afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
       document.getElementById('bulletinContainer').style.display = 'none';
       return;
+    }
+
+    if (currentMode !== 'admin') {
+      const estPublie = donneesActuelles.publicationSemestres?.[anneeKey]?.[semestreKey] === true;
+      if (!estPublie) {
+        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles.");
+        document.getElementById('bulletinContainer').style.display = 'none';
+        return;
+      }
+
+      const notesSemestre = etudiant.notes?.[anneeKey]?.[semestreKey] || {};
+      const nombreNotesSaisies = Object.keys(notesSemestre).length;
+      const sommeNotes = Object.values(notesSemestre).reduce((acc, val) => acc + (parseFloat(val) || 0), 0);
+
+      if (nombreNotesSaisies === 0 || sommeNotes === 0) {
+        afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
+        document.getElementById('bulletinContainer').style.display = 'none';
+        return;
+      }
     }
 
     const filiereSelect = document.getElementById('filiereSelect');
@@ -498,8 +685,8 @@ function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
           <tr>
             <th>Unité d'Enseignement (UE) / Élément Constitutif (EC)</th>
             <th class="text-center">Crédits</th>
-            <th class="text-center">Moyenne EC</th>
-            <th class="text-center">Moyenne UE</th>
+            <th class="text-center">Notes</th>
+            <th class="text-center">Moy. UE</th>
             <th class="text-center">Statut</th>
           </tr>
         </thead>
@@ -628,6 +815,7 @@ if (saveChangesBtn) {
       const structureSemestre = donneesActuelles.structureUEParNiveau[anneeKey][semestreKey];
       
       afficherBulletin(filiereTexte, anneeKey, semestreKey, structureSemestre, etudiant);
+      calculerEtAfficherStatistiquesAdmin();
     }
   });
 }
