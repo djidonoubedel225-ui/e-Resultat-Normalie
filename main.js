@@ -648,7 +648,7 @@ if (actionBtn) {
     
     const matricule = matriculeInput.value.trim();
     if(!matricule) {
-      afficherErreurMatricule("Veuillez entrer un numéro de matricule !");
+      afficherErreurMatricule("Veuillez entrer un numéro matricule !");
       document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
@@ -669,7 +669,7 @@ if (actionBtn) {
       const estPublie = donneesActuelles.publicationSemestres?.[anneeKey]?.[semestreKey] === true;
       
       if (!estPublie) {
-        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles (délibération en attente).");
+        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles.");
         document.getElementById('bulletinContainer').style.display = 'none';
         return;
       }
@@ -677,7 +677,7 @@ if (actionBtn) {
 
     const structureSemestre = donneesActuelles.structureUEParNiveau?.[anneeKey]?.[semestreKey] || [];
     if(structureSemestre.length === 0) {
-      afficherErreurMatricule("Aucune maquette pédagogique configurée pour ce semestre.");
+      afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
       document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
