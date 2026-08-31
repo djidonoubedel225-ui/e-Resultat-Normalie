@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-RESULTAT NORMALIEN</title>
+  <title>E-RESULTAT NORMALIEN | Plateforme Académique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --primary: #1e3a8a;
+      --primary-light: #3b82f6;
       --primary-hover: #1e40af;
       --bg-main: #f8fafc;
       --card-bg: #ffffff;
@@ -14,31 +19,46 @@
       --text-muted: #64748b;
       --border: #e2e8f0;
       --success: #16a34a;
+      --success-bg: #dcfce7;
       --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
-      margin: 0;
-      padding: 1rem;
+      line-height: 1.5;
+      padding: 1.5rem 1rem;
     }
 
     .container {
-      max-width: 850px;
+      max-width: 900px;
       margin: 0 auto;
     }
 
     /* En-tête, Logo & Bannière */
     .app-header {
       text-align: center;
-      margin-bottom: 2rem;
-      padding: 1.5rem 1rem;
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      padding: 1.75rem 1.25rem;
+      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+      border-radius: var(--radius-lg);
       border: 1px solid var(--border);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+      box-shadow: var(--shadow-sm);
     }
 
     .logo-container {
@@ -46,74 +66,74 @@
       align-items: center;
       justify-content: center;
       gap: 1rem;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1rem;
     }
 
-    /* Mise en valeur spécifique des lettres ERN */
     .logo-icon {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
       color: white;
       font-weight: 900;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       width: 60px;
       height: 60px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
-      letter-spacing: 1px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 6px 12px rgba(30, 58, 138, 0.25);
+      letter-spacing: 0.5px;
     }
 
     .logo-icon span {
       font-size: 0.55rem;
-      font-weight: 500;
-      opacity: 0.85;
-      letter-spacing: 0px;
+      font-weight: 600;
+      opacity: 0.9;
+      letter-spacing: 1px;
+      margin-top: 2px;
     }
 
     .logo-text h1 {
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       color: var(--primary);
-      margin: 0;
       font-weight: 800;
-      letter-spacing: 0.5px;
+      line-height: 1.2;
     }
 
-    /* Style textuel pour accentuer ERN dans le titre si besoin */
     .highlight-ern {
-      color: #3b82f6;
-      font-weight: 900;
+      color: var(--primary-light);
     }
 
     .logo-tagline {
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 500;
+      display: block;
+      margin-top: 4px;
     }
 
-    .welcome-banner {
-      background: var(--card-bg);
-      padding: 1rem;
-      border-radius: 8px;
-      border-left: 4px solid var(--primary);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .welcome-banner h2 {
-      font-size: 1.05rem;
-      color: var(--text-main);
-      margin: 0 0 0.4rem 0;
-      font-weight: 700;
-    }
-
-    .welcome-banner p {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin: 0;
-      font-style: italic;
-    }
+   .welcome-banner {
+       background: var(--card-bg);
+       padding: 1rem;
+       border-radius: 8px;
+       border-left: 4px solid var(--primary);
+       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      .welcome-banner h2 {
+        font-size: 0.9rem;
+        color: var(--text-main);
+        margin: 0 0 0.4rem 0;
+        font-weight: 700;
+        
+      }
+      .welcome-banner p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin: 0;
+        font-style: italic;
+        
+      }
 
     /* Navigation Modes */
     .mode-selector {
@@ -122,44 +142,51 @@
       margin-bottom: 1.5rem;
       background: #e2e8f0;
       padding: 4px;
-      border-radius: 8px;
+      border-radius: var(--radius-sm);
     }
 
     .mode-btn {
       flex: 1;
-      padding: 0.75rem;
+      padding: 0.75rem 0.5rem;
       border: none;
       background: transparent;
       font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
       cursor: pointer;
       border-radius: 6px;
-      transition: all 0.2s;
+      text-align: center;
+      transition: var(--transition);
+      line-height: 1.3;
+    }
+
+    .mode-btn:hover {
+      color: var(--text-main);
     }
 
     .mode-btn.active-tab {
       background: var(--card-bg);
       color: var(--primary);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: var(--shadow-sm);
     }
 
     /* Cartes & Formulaires */
     .card {
       background: var(--card-bg);
       padding: 1.5rem;
-      border-radius: 12px;
+      border-radius: var(--radius-lg);
       border: 1px solid var(--border);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      box-shadow: var(--shadow-md);
       margin-bottom: 1.5rem;
     }
 
     .form-row {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
-      margin-bottom: 1rem;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       .form-row { grid-template-columns: 1fr; }
     }
 
@@ -167,37 +194,55 @@
       margin-bottom: 1rem;
     }
 
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
     .form-group label {
       display: block;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
       margin-bottom: 0.4rem;
       color: var(--text-main);
     }
 
     select, input {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.75rem 1rem;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       font-size: 0.95rem;
-      box-sizing: border-box;
+      font-family: inherit;
+      color: var(--text-main);
       background: #fff;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
     button {
       cursor: pointer;
       font-weight: 600;
+      font-family: inherit;
       padding: 0.75rem 1.25rem;
-      border-radius: 6px;
+      border-radius: var(--radius-sm);
       border: none;
-      transition: background 0.2s;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .btn-primary {
       background: var(--primary);
       color: white;
       width: 100%;
+      box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
     }
 
     .btn-primary:hover {
@@ -209,27 +254,39 @@
       color: var(--text-main);
     }
 
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
     .btn-danger {
-      background: #fee2e2;
+      background: var(--danger-bg);
       color: var(--danger);
       padding: 0.4rem 0.8rem;
       font-size: 0.85rem;
     }
 
-    /* Message d'erreur personnalisé sans alert() */
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    /* Message d'erreur intégré élégant (remplace l'alerte native) */
     .error-message {
+      background-color: var(--danger-bg);
       color: var(--danger);
-      font-weight: bold;
-      font-size: 0.85rem;
-      margin-top: 6px;
+      border: 1px solid #fecaca;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
       display: none;
     }
 
-    /* Panneaux */
+    /* Panneaux d'affichage */
     #adminPanelContainer {
       display: none;
       border: 2px dashed var(--primary);
-      background: #f8fafc;
+      background: #fafafa;
     }
 
     #studentSection {
@@ -239,46 +296,57 @@
     .ue-builder-card {
       background: white;
       border: 1px solid var(--border);
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 1.25rem;
+      border-radius: var(--radius-sm);
       margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
     }
 
     .ue-builder-header {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.75rem;
       align-items: center;
-      margin-bottom: 0.8rem;
+      margin-bottom: 1rem;
       flex-wrap: wrap;
     }
 
     .ec-builder-row {
       display: flex;
       gap: 0.5rem;
-      margin-bottom: 0.5rem;
-      padding-left: 1rem;
+      margin-bottom: 0.75rem;
       align-items: center;
+      flex-wrap: wrap;
     }
 
-    .ec-builder-row .ec-code { width: 110px; flex-shrink: 0; }
-    .ec-builder-row .ec-label { flex: 2; }
-
-    .student-item-badge {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: white;
-      padding: 0.6rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-    }
+    .ec-builder-row .ec-code { width: 120px; flex-shrink: 0; }
+     .ec-builder-row .ec-label,
+       #ueBuilderList input[type="text"]:nth-of-type(2) {
+         flex: 1;
+         min-width: 150px;
+        }
 
     /* Tableau Bulletin */
     #bulletinContainer {
       display: none;
       margin-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+    }
+
+    .bulletin-header-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .bulletin-header-info { grid-template-columns: 1fr; }
     }
 
     .academic-table {
@@ -287,6 +355,9 @@
       margin-top: 1rem;
       background: white;
       font-size: 0.9rem;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--border);
     }
 
     .academic-table th, .academic-table td {
@@ -297,6 +368,7 @@
     .academic-table th {
       background: #f1f5f9;
       color: var(--text-main);
+      font-weight: 700;
       text-align: left;
     }
 
@@ -304,48 +376,67 @@
     
     .ue-row-header {
       background: #f8fafc;
-      font-weight: bold;
+      font-weight: 700;
+      color: var(--primary);
     }
 
-    .status-v { color: var(--success); font-weight: bold; }
-    .status-nv { color: var(--danger); font-weight: bold; }
-
-    /* Styles pour les cadres de statut du semestre */
-    .status-valide {
-      background-color: #28a745;
-      color: #ffffff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
+    /* Status Badges */
+    .status-valide, .status-v {
+      background-color: var(--success-bg);
+      color: var(--success);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.8rem;
       text-transform: uppercase;
       display: inline-block;
     }
 
-    .status-non-valide {
-      background-color: #dc3545;
-      color: #ffffff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
+    .status-non-valide, .status-nv {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.8rem;
       text-transform: uppercase;
       display: inline-block;
     }
 
     .input-note {
       width: 75px;
-      padding: 4px;
+      padding: 6px;
       text-align: center;
+      font-weight: 600;
     }
 
-    .bulletin-header-info {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 0.95rem;
-      background: #f8fafc;
+    /* Modal Administrateur */
+    #adminModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
       padding: 1rem;
-      border-radius: 8px;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
   </style>
 </head>
@@ -353,7 +444,6 @@
 
   <div class="container">
     
-    <!-- En-tête / Logo et Message de Bienvenue (ERN mis en valeur) -->
     <header class="app-header">
       <div class="logo-container">
         <div class="logo-icon">
@@ -372,16 +462,14 @@
       </div>
     </header>
 
-    <!-- Navigation Modes -->
     <div class="mode-selector">
       <button type="button" id="btnModeStudent" class="mode-btn active-tab">Espace Étudiant / Consultation</button>
       <button type="button" id="btnAdminMode" class="mode-btn">Espace Administration</button>
     </div>
 
-    <!-- Configuration globale (Filière / Niveau / Semestre) -->
     <div class="card">
       <div class="form-row">
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group">
           <label for="filiereSelect">Filière</label>
           <select id="filiereSelect">
             <option value="Allemand">Allemand</option>
@@ -392,7 +480,7 @@
             <option value="Philosophie">Philosophie</option>
           </select>
         </div>
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group">
           <label for="anneeSelect">Niveau</label>
           <select id="anneeSelect" onchange="mettreAJourSemestres()">
             <option value="BAPES 1">BAPES 1</option>
@@ -400,16 +488,13 @@
             <option value="BAPES 3">BAPES 3</option>
           </select>
         </div>
-        <div class="form-group" style="margin-bottom:0;">
+        <div class="form-group">
           <label for="semestreSelect">Semestre</label>
           <select id="semestreSelect">
-            <!-- Semestres BAPES 1 -->
             <option value="Semestre 1" data-niveau="BAPES 1">Semestre 1</option>
             <option value="Semestre 2" data-niveau="BAPES 1">Semestre 2</option>
-            <!-- Semestres BAPES 2 -->
             <option value="Semestre 3" data-niveau="BAPES 2">Semestre 3</option>
             <option value="Semestre 4" data-niveau="BAPES 2">Semestre 4</option>
-            <!-- Semestres BAPES 3 -->
             <option value="Semestre 5" data-niveau="BAPES 3">Semestre 5</option>
             <option value="Semestre 6" data-niveau="BAPES 3">Semestre 6</option>
           </select>
@@ -417,20 +502,18 @@
       </div>
     </div>
 
-    <!-- ESPACE ÉTUDIANT (Saisie du Matricule & Consultation) -->
     <div id="studentSection" class="card">
-      <h3 style="margin-top:0; color:var(--primary);">Consulter vos notes</h3>
+      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem; font-size: 1.15rem;">Consultez vos notes ici !</h3>
       <div class="form-group">
-        <label for="matriculeInput">Numéro de Matricule :</label>
-        <input type="text" id="matriculeInput" placeholder="Entrez votre matricule (ex: 10000000)">
-        <!-- Élément d'affichage pour le message d'erreur personnalisé -->
+        <label for="matriculeInput">Numéro Matricule :</label>
+        <input type="text" id="matriculeInput" placeholder="Entrez votre matricule (ex: 11910000)">
         <div id="messageErreur" class="error-message"></div>
       </div>
-      <button type="button" id="actionBtn" class="btn-primary">Consulter votre résultat</button>
+      <br>
+      <button type="button" id="actionBtn" class="btn-primary">Accédez à vos résultats</button>
 
-      <!-- BULLETIN / RÉSULTATS (Caché par défaut) -->
       <div id="bulletinContainer">
-        <h3 style="text-align: center; color: var(--primary); margin-top: 0;">BULLETIN DE NOTES</h3>
+        <h3 style="text-align: center; color: var(--primary); margin-bottom: 1.25rem;">BULLETIN DE NOTES</h3>
         <div class="bulletin-header-info">
           <div><strong>Filière :</strong> <span id="resFiliere"></span></div>
           <div><strong>Niveau :</strong> <span id="resNiveau"></span></div>
@@ -441,20 +524,19 @@
 
         <div id="uesDynamicContainer"></div>
 
-        <div style="margin-top: 1rem; background: #f8fafc; padding: 1rem; border-radius: 8px; font-size: 0.95rem;">
+        <div style="margin-top: 1.25rem; background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.95rem; display: grid; gap: 0.5rem;">
           <div><strong>Crédits Acquis :</strong> <span id="resCredits">0</span> / 30</div>
-          <div><strong>Pourcentage de validation :</strong> <span id="resPercentage">0%</span></div>
+          <div><strong>Pourcentage validé :</strong> <span id="resPercentage">0%</span></div>
           <div><strong>Moyenne Semestrielle :</strong> <span id="resSemestreAvg">0.00/20</span></div>
-          <div><strong>Statut du Semestre :</strong> <span id="resGlobalStatus">-</span></div>
+          <div><strong>DÉCISION :</strong> <span id="resGlobalStatus">-</span></div>
         </div>
 
         <button type="button" id="saveChangesBtn" class="btn-primary" style="background-color: var(--success); margin-top: 1.5rem; display: none;">Enregistrer les notes de l'étudiant</button>
       </div>
     </div>
 
-    <!-- PANNEAU ADMINISTRATION (Caché par défaut) -->
     <div id="adminPanelContainer" class="card">
-      <h3 style="margin-top:0; color:var(--primary);">Configuration des Étudiants (Global)</h3>
+      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration des Étudiants (Global)</h3>
       <div class="form-row">
         <div class="form-group">
           <label>Matricule</label>
@@ -468,11 +550,11 @@
           <button type="button" class="btn-primary" id="addStudentBtn">+ Ajouter l'Étudiant</button>
         </div>
       </div>
-      <div id="adminStudentsList" style="margin-bottom: 2rem;"></div>
+      <div id="adminStudentsList" style="margin-top: 1.5rem; margin-bottom: 2rem;"></div>
 
-      <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+      <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.75rem 0;">
 
-      <h3 style="margin-top:0; color:var(--primary);">Configuration de la Maquette Pédagogique (Par Semestre)</h3>
+      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration de la Maquette Pédagogique (Par Semestre)</h3>
       <div id="ueBuilderList"></div>
       <button type="button" class="btn-secondary" onclick="ajouterUE()">+ Ajouter une Unité d'Enseignement (UE)</button>
       <br><br>
@@ -481,18 +563,25 @@
 
   </div>
 
-  <!-- Modal Personnalisé pour l'Accès Administrateur -->
-  <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: var(--card-bg); padding: 2rem; border-radius: 16px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border);">
+  <div id="adminModal">
+    <div class="modal-content">
       <div style="text-align: center; margin-bottom: 1.5rem;">
-        <div style="background: #e0e7ff; color: var(--primary); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; font-size: 1.25rem;">🔒</div>
-        <h3 style="margin: 0 0 0.5rem 0; color: var(--primary); font-size: 1.25rem;">Espace Administration</h3>
-        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Veuillez entrer la clé d'accès sécurisée :</p>
+        <div style="background: #e0e7ff; color: var(--primary); width: 52px; height: 52px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; font-size: 1.5rem;">🔒</div>
+        <h3 style="margin: 0 0 0.4rem 0; color: var(--primary); font-size: 1.25rem;">Espace Administration</h3>
+        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Veuillez vous identifier :</p>
       </div>
+
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label for="adminEmailInput" style="font-size: 0.8rem; margin-bottom: 0.25rem;">E-mail Admin</label>
+        <input type="email" id="adminEmailInput" placeholder="Entrez votre admin mail..." value="">
+      </div>
+
       <div class="form-group" style="margin-bottom: 1.25rem;">
-        <input type="password" id="adminKeyInput" placeholder="Votre clé secrète..." style="text-align: center; letter-spacing: 1px;">
-        <div id="adminModalError" class="error-message" style="text-align: center; margin-top: 6px;"></div>
+        <label for="adminKeyInput" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Mot de passe</label>
+        <input type="password" id="adminKeyInput" placeholder="Votre mot de passe...">
+        <div id="adminModalError" class="error-message" style="text-align: center; border: none; background: transparent; padding: 0;"></div>
       </div>
+
       <div style="display: flex; gap: 0.75rem;">
         <button type="button" id="adminModalCancel" class="btn-secondary" style="flex: 1;">Annuler</button>
         <button type="button" id="adminModalSubmit" class="btn-primary" style="flex: 1;">Valider</button>
@@ -500,7 +589,6 @@
     </div>
   </div>
 
-  <!-- Script pour filtrer dynamiquement les semestres selon le niveau choisi -->
   <script>
     function mettreAJourSemestres() {
       const niveauSelect = document.getElementById('anneeSelect');
@@ -530,9 +618,7 @@
     });
   </script>
 
-  <!-- Intégration du SDK Supabase via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Votre script JavaScript principal -->
   <script src="main.js"></script>
 </body>
 </html>
