@@ -51,19 +51,30 @@ function afficherErreurMatricule(message) {
   }
 }
 
-// --- INITIALISATION AU CHARGEMENT DE LA PAGE (Avec vérification de session persistante) ---
+// --- INITIALISATION AU CHARGEMENT DE LA PAGE (Forçage strict de l'espace Étudiant par défaut) ---
 window.addEventListener('DOMContentLoaded', async () => {
   if (typeof mettreAJourSemestres === 'function') {
     mettreAJourSemestres();
   }
 
-  // Vérifie si une session admin est déjà active dans le stockage local du navigateur
-  if (_supabase) {
-    const { data: { session } } = await _supabase.auth.getSession();
-    if (session) {
-      basculerModeAdminReussi();
-    }
-  }
+  // On force explicitement l'état initial sur le mode Étudiant au chargement/rafraîchissement
+  currentMode = 'student';
+  if (btnModeStudent) btnModeStudent.classList.add('active-tab');
+  if (btnAdminMode) btnAdminMode.classList.remove('active-tab');
+  
+  const actionBtnEl = document.getElementById('actionBtn');
+  if (actionBtnEl) actionBtnEl.textContent = "Accédez à vos résultats";
+  
+  const adminPanelEl = document.getElementById('adminPanelContainer');
+  if (adminPanelEl) adminPanelEl.style.display = 'none';
+  
+  const saveChangesEl = document.getElementById('saveChangesBtn');
+  if (saveChangesEl) saveChangesEl.style.display = 'none';
+  
+  const bulletinEl = document.getElementById('bulletinContainer');
+  if (bulletinEl) bulletinEl.style.display = 'none';
+  
+  afficherErreurMatricule('');
 });
 
 // --- 1. GESTION DES MODES (ÉTUDIANT / ADMIN) ---
@@ -94,7 +105,7 @@ const adminModalSubmit = document.getElementById('adminModalSubmit');
 
 if (btnAdminMode && adminModal) {
   btnAdminMode.addEventListener('click', async () => {
-    // Si déjà connecté, un clic sur le bouton Admin réaffiche simplement le panneau sans redemander le mot de passe
+    // Si l'utilisateur est déjà connecté en admin dans la session active, on bascule directement
     if (_supabase) {
       const { data: { session } } = await _supabase.auth.getSession();
       if (session) {
@@ -182,7 +193,7 @@ if (adminModalSubmit) {
   }
 });
 
-// --- GESTION DE LA DÉCONNEXION SÉCURISÉE (Corrigée pour GitHub Pages) ---
+// --- GESTION DE LA DÉCONNEXION SÉCURISÉE (Corrigée et radicale) ---
 const btnDeconnexion = document.getElementById('btnDeconnexion');
 if (btnDeconnexion) {
   btnDeconnexion.addEventListener('click', async () => {
@@ -193,15 +204,19 @@ if (btnDeconnexion) {
     } catch (err) {
       console.error("Erreur lors de la déconnexion Supabase :", err);
     } finally {
-      // Nettoyage forcé du stockage local pour éviter les interférences sur GitHub Pages
+      // 1. Suppression ciblée de toutes les clés de session Supabase dans le localStorage
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+        if (key.includes('supabase.auth.token') || key.startsWith('sb-')) {
           localStorage.removeItem(key);
         }
       });
+      
+      // 2. Nettoyage global de sécurité du stockage de session
+      sessionStorage.clear();
 
+      // 3. Forçage de la redirection/rechargement vers la racine propre
       currentMode = 'student';
-      window.location.reload(); 
+      window.location.href = window.location.pathname; 
     }
   });
 }
