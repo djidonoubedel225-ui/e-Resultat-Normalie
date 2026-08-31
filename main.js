@@ -14,18 +14,32 @@ try {
 }
 
 // Clé secrète administrateur
-const CLE_ADMIN_SECRETE = "Bedel"; 
+const CLE_ADMIN_SECRETE = "DDJDYGDMTB"; 
 let currentMode = 'student';
 
-// Structure de données globale par filière
+// Structure de données globale par filière (BAPES et 6 semestres)
 let donneesActuelles = {
   structureUEParNiveau: {
-    "Licence 1": { "Semestre 1": [], "Semestre 2": [] },
-    "Licence 2": { "Semestre 1": [], "Semestre 2": [] },
-    "Licence 3": { "Semestre 1": [], "Semestre 2": [] }
+    "BAPES 1": { "Semestre 1": [], "Semestre 2": [] },
+    "BAPES 2": { "Semestre 3": [], "Semestre 4": [] },
+    "BAPES 3": { "Semestre 5": [], "Semestre 6": [] }
   },
   etudiants: []
 };
+
+// Fonction utilitaire pour gérer l'affichage de l'erreur du matricule sans alert()
+function afficherErreurMatricule(message) {
+  const messageBox = document.getElementById('messageErreur');
+  if (messageBox) {
+    if (message) {
+      messageBox.textContent = message;
+      messageBox.style.display = 'block';
+    } else {
+      messageBox.textContent = '';
+      messageBox.style.display = 'none';
+    }
+  }
+}
 
 // --- 1. GESTION DES MODES (ÉTUDIANT / ADMIN) ---
 const btnModeStudent = document.getElementById('btnModeStudent');
@@ -41,38 +55,73 @@ if (btnModeStudent) {
     document.getElementById('adminPanelContainer').style.display = 'none';
     document.getElementById('saveChangesBtn').style.display = 'none';
     document.getElementById('bulletinContainer').style.display = 'none';
+    afficherErreurMatricule(''); // Nettoyer les erreurs en changeant de mode
   });
 }
 
 const btnAdminMode = document.getElementById('btnAdminMode');
-if (btnAdminMode) {
-  btnAdminMode.addEventListener('click', async (e) => {
+const adminModal = document.getElementById('adminModal');
+const adminKeyInput = document.getElementById('adminKeyInput');
+const adminModalError = document.getElementById('adminModalError');
+const adminModalCancel = document.getElementById('adminModalCancel');
+const adminModalSubmit = document.getElementById('adminModalSubmit');
+
+if (btnAdminMode && adminModal) {
+  btnAdminMode.addEventListener('click', () => {
+    // Affichage du modal personnalisé à la place du prompt() natif
+    adminModal.style.display = 'flex';
+    adminKeyInput.value = '';
+    adminModalError.style.display = 'none';
+    adminKeyInput.focus();
+  });
+}
+
+// Fermeture du modal Admin via "Annuler"
+if (adminModalCancel) {
+  adminModalCancel.addEventListener('click', () => {
+    adminModal.style.display = 'none';
+    if (btnModeStudent) btnModeStudent.classList.add('active-tab');
+    if (btnAdminMode) btnAdminMode.classList.remove('active-tab');
+  });
+}
+
+// Validation de la clé dans le modal Admin personnalisé
+if (adminModalSubmit) {
+  adminModalSubmit.addEventListener('click', async () => {
     try {
-      const saisieCle = prompt("Veuillez entrer la clé d'accès à l'espace administrateur :");
-      if (saisieCle === null) return; 
+      const saisieCle = adminKeyInput.value.trim();
 
       if (saisieCle === CLE_ADMIN_SECRETE) {
         currentMode = 'admin';
-        e.target.classList.add('active-tab');
+        adminModal.style.display = 'none';
         
+        if (btnAdminMode) btnAdminMode.classList.add('active-tab');
         if (btnModeStudent) btnModeStudent.classList.remove('active-tab');
         
         document.getElementById('actionBtn').textContent = "Charger les notes de l'étudiant";
         document.getElementById('adminPanelContainer').style.display = 'block';
         document.getElementById('saveChangesBtn').style.display = 'block';
         document.getElementById('bulletinContainer').style.display = 'none';
+        afficherErreurMatricule('');
         
         await chargerDonneesDepuisSupabase();
         chargerInterfaceAdmin();
-        
-        alert("Accès autorisé. Bienvenue dans l'espace administrateur.");
       } else {
-        alert("Clé d'accès incorrecte. Accès refusé.");
-        if (btnModeStudent) btnModeStudent.classList.add('active-tab');
-        e.target.classList.remove('active-tab');
+        adminModalError.textContent = "Clé d'accès incorrecte !";
+        adminModalError.style.display = 'block';
+        adminKeyInput.focus();
       }
     } catch (err) {
       console.error("Erreur mode admin :", err);
+    }
+  });
+}
+
+// Permettre la validation par la touche "Entrée" dans l'input de la clé admin
+if (adminKeyInput) {
+  adminKeyInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      adminModalSubmit.click();
     }
   });
 }
@@ -87,6 +136,7 @@ if (btnAdminMode) {
         chargerInterfaceAdmin();
       }
       document.getElementById('bulletinContainer').style.display = 'none';
+      afficherErreurMatricule('');
     });
   }
 });
@@ -107,9 +157,9 @@ async function chargerDonneesDepuisSupabase() {
     if (error || !data || !data.content) {
       donneesActuelles = {
         structureUEParNiveau: {
-          "Licence 1": { "Semestre 1": [], "Semestre 2": [] },
-          "Licence 2": { "Semestre 1": [], "Semestre 2": [] },
-          "Licence 3": { "Semestre 1": [], "Semestre 2": [] }
+          "BAPES 1": { "Semestre 1": [], "Semestre 2": [] },
+          "BAPES 2": { "Semestre 3": [], "Semestre 4": [] },
+          "BAPES 3": { "Semestre 5": [], "Semestre 6": [] }
         },
         etudiants: []
       };
@@ -117,9 +167,9 @@ async function chargerDonneesDepuisSupabase() {
       donneesActuelles = data.content;
       if (!donneesActuelles.structureUEParNiveau) {
         donneesActuelles.structureUEParNiveau = {
-          "Licence 1": { "Semestre 1": [], "Semestre 2": [] },
-          "Licence 2": { "Semestre 1": [], "Semestre 2": [] },
-          "Licence 3": { "Semestre 1": [], "Semestre 2": [] }
+          "BAPES 1": { "Semestre 1": [], "Semestre 2": [] },
+          "BAPES 2": { "Semestre 3": [], "Semestre 4": [] },
+          "BAPES 3": { "Semestre 5": [], "Semestre 6": [] }
         };
       }
       if (!donneesActuelles.etudiants) donneesActuelles.etudiants = [];
@@ -187,9 +237,9 @@ if (addStudentBtn) {
       matricule,
       nom,
       notes: {
-        "Licence 1": { "Semestre 1": {}, "Semestre 2": {} },
-        "Licence 2": { "Semestre 1": {}, "Semestre 2": {} },
-        "Licence 3": { "Semestre 1": {}, "Semestre 2": {} }
+        "BAPES 1": { "Semestre 1": {}, "Semestre 2": {} },
+        "BAPES 2": { "Semestre 3": {}, "Semestre 4": {} },
+        "BAPES 3": { "Semestre 5": {}, "Semestre 6": {} }
       }
     });
     
@@ -217,11 +267,31 @@ function chargerListeEtudiantsAdmin() {
     item.className = 'student-item-badge';
     item.innerHTML = `
       <span><strong>${etudiant.matricule}</strong> - ${etudiant.nom}</span>
-      <button type="button" class="btn-danger" onclick="supprimerEtudiant(${index})">Supprimer</button>
+      <div>
+        <button type="button" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-right: 5px;" onclick="modifierEtudiant(${index})">Modifier</button>
+        <button type="button" class="btn-danger" onclick="supprimerEtudiant(${index})">Supprimer</button>
+      </div>
     `;
     listContainer.appendChild(item);
   });
 }
+
+window.modifierEtudiant = async function(index) {
+  const etudiant = donneesActuelles.etudiants[index];
+  const nouveauNom = prompt(`Modifier le nom et prénoms pour l'étudiant (${etudiant.matricule}) :`, etudiant.nom);
+  
+  if (nouveauNom === null) return; 
+  
+  const nomNettoye = nouveauNom.trim();
+  if (!nomNettoye) {
+    alert("Le nom ne peut pas être vide.");
+    return;
+  }
+
+  donneesActuelles.etudiants[index].nom = nomNettoye;
+  await sauvegarderDonneesVersSupabase();
+  chargerListeEtudiantsAdmin();
+};
 
 window.supprimerEtudiant = async function(index) {
   donneesActuelles.etudiants.splice(index, 1);
@@ -245,7 +315,7 @@ function chargerInterfaceBuilder() {
   const semestre = document.getElementById('semestreSelect').value;
 
   if (!donneesActuelles.structureUEParNiveau[annee]) {
-    donneesActuelles.structureUEParNiveau[annee] = { "Semestre 1": [], "Semestre 2": [] };
+    donneesActuelles.structureUEParNiveau[annee] = {};
   }
   if (!donneesActuelles.structureUEParNiveau[annee][semestre]) {
     donneesActuelles.structureUEParNiveau[annee][semestre] = [];
@@ -261,6 +331,13 @@ function chargerInterfaceBuilder() {
 window.ajouterUE = function() {
   const annee = document.getElementById('anneeSelect').value;
   const semestre = document.getElementById('semestreSelect').value;
+
+  if (!donneesActuelles.structureUEParNiveau[annee]) {
+    donneesActuelles.structureUEParNiveau[annee] = {};
+  }
+  if (!donneesActuelles.structureUEParNiveau[annee][semestre]) {
+    donneesActuelles.structureUEParNiveau[annee][semestre] = [];
+  }
 
   donneesActuelles.structureUEParNiveau[annee][semestre].push({
     nomUE: `UE${donneesActuelles.structureUEParNiveau[annee][semestre].length + 1}`,
@@ -369,7 +446,8 @@ if (actionBtn) {
     
     const matricule = matriculeInput.value.trim();
     if(!matricule) {
-      alert("Veuillez entrer un numéro de matricule.");
+      afficherErreurMatricule("Veuillez entrer un numéro de matricule !");
+      document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
 
@@ -377,16 +455,22 @@ if (actionBtn) {
 
     let etudiant = donneesActuelles.etudiants.find(e => e.matricule.toLowerCase() === matricule.toLowerCase());
     if (!etudiant) {
-      alert("Aucun étudiant trouvé avec ce matricule dans cette filière. Veuillez l'inscrire d'abord dans l'espace administration.");
+      afficherErreurMatricule("Aucun(e) Étudiant(e) Identifié(e) !");
+      document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
+
+    // Effacer le message d'erreur si l'étudiant est bien trouvé
+    afficherErreurMatricule("");
 
     const anneeKey = document.getElementById('anneeSelect').value;
     const semestreKey = document.getElementById('semestreSelect').value;
 
     const structureSemestre = donneesActuelles.structureUEParNiveau?.[anneeKey]?.[semestreKey] || [];
     if(structureSemestre.length === 0) {
-      alert(`Aucune maquette pédagogique configurée pour ${anneeKey} - ${semestreKey}.`);
+      // Remplacement de l'alerte par le message dynamique demandé
+      afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
+      document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
 
@@ -490,7 +574,6 @@ function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
   let moyenneSemestrielle = totalWeightedScores / totalSemestreCredits;
   let pourcentage = (totalCreditsAcquired / totalSemestreCredits) * 100;
 
-  // --- STATUT GLOBAL AVEC LE NOUVEAU STYLE (MAJUSCULES, CADRE VERT/ROUGE) ---
   let statutGlobalText = "NON VALIDÉ";
   let statutClassStyle = "status-non-valide";
 
