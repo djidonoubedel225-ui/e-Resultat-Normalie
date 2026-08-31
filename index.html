@@ -22,6 +22,8 @@
       --success-bg: #dcfce7;
       --danger: #dc2626;
       --danger-bg: #fee2e2;
+      --warning-bg: #fef3c7;
+      --warning-text: #d97706;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
@@ -112,28 +114,27 @@
       margin-top: 4px;
     }
 
-   .welcome-banner {
-       background: var(--card-bg);
-       padding: 1rem;
-       border-radius: 8px;
-       border-left: 4px solid var(--primary);
-       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      }
+    .welcome-banner {
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
       
-      .welcome-banner h2 {
-        font-size: 0.9rem;
-        color: var(--text-main);
-        margin: 0 0 0.4rem 0;
-        font-weight: 700;
-        
-      }
-      .welcome-banner p {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        margin: 0;
-        font-style: italic;
-        
-      }
+    .welcome-banner h2 {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin: 0 0 0.4rem 0;
+      font-weight: 700;
+    }
+
+    .welcome-banner p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+      font-style: italic;
+    }
 
     /* Navigation Modes */
     .mode-selector {
@@ -182,11 +183,15 @@
 
     .form-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
+      .form-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 576px) {
       .form-row { grid-template-columns: 1fr; }
     }
 
@@ -269,7 +274,7 @@
       background: #fecaca;
     }
 
-    /* Message d'erreur intégré élégant (remplace l'alerte native) */
+    /* Message d'erreur intégré élégant */
     .error-message {
       background-color: var(--danger-bg);
       color: var(--danger);
@@ -319,11 +324,11 @@
     }
 
     .ec-builder-row .ec-code { width: 120px; flex-shrink: 0; }
-     .ec-builder-row .ec-label,
-       #ueBuilderList input[type="text"]:nth-of-type(2) {
-         flex: 1;
-         min-width: 150px;
-        }
+    .ec-builder-row .ec-label,
+    #ueBuilderList input[type="text"]:nth-of-type(2) {
+      flex: 1;
+      min-width: 150px;
+    }
 
     /* Tableau Bulletin */
     #bulletinContainer {
@@ -410,6 +415,42 @@
       font-weight: 600;
     }
 
+    /* Style spécifique pour l'option de rattrapage par UE (Option 2) */
+    .rattrapage-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--warning-bg);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--warning-text);
+      margin-top: 0.5rem;
+      width: fit-content;
+    }
+
+    .rattrapage-container input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* --- CORRECTION ERGONOMIQUE DU FORMULAIRE D'AJOUT ÉTUDIANT --- */
+    .admin-student-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr auto;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    @media (max-width: 768px) {
+      .admin-student-form-grid {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+      }
+    }
+
     /* Modal Administrateur */
     #adminModal {
       display: none;
@@ -467,6 +508,7 @@
       <button type="button" id="btnAdminMode" class="mode-btn">Espace Administration</button>
     </div>
 
+    <!-- Filtres Académiques & Promotionnels -->
     <div class="card">
       <div class="form-row">
         <div class="form-group">
@@ -478,6 +520,14 @@
             <option value="Histoire-Géographie">Histoire-Géographie</option>
             <option value="Lettres Modernes">Lettres Modernes</option>
             <option value="Philosophie">Philosophie</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="promotionSelect">Promotion</label>
+          <select id="promotionSelect">
+            <option value="15ème Promotion">15ème Promotion</option>
+            <option value="16ème Promotion">16ème Promotion</option>
+            <option value="17ème Promotion" selected>17ème Promotion</option>
           </select>
         </div>
         <div class="form-group">
@@ -536,25 +586,28 @@
     </div>
 
     <div id="adminPanelContainer" class="card">
-      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration des Étudiants (Global)</h3>
-      <div class="form-row">
+      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration des Étudiants (Par Promotion)</h3>
+      
+      <!-- Grille corrigée pour éviter les cadres trop petits sur mobile -->
+      <div class="admin-student-form-grid">
         <div class="form-group">
-          <label>Matricule</label>
-          <input type="text" id="newMatricule" placeholder="Ex: 10000000">
+          <label for="newMatricule">Matricule</label>
+          <input type="text" id="newMatricule" placeholder="Ex: 11910000">
         </div>
         <div class="form-group">
-          <label>Nom et Prénoms</label>
-          <input type="text" id="newNom" placeholder="Nom de l'étudiant">
+          <label for="newNom">Nom et Prénoms</label>
+          <input type="text" id="newNom" placeholder="Identité de l'étudiant">
         </div>
-        <div class="form-group" style="display: flex; align-items: flex-end;">
+        <div class="form-group">
           <button type="button" class="btn-primary" id="addStudentBtn">+ Ajouter l'Étudiant</button>
         </div>
       </div>
+      
       <div id="adminStudentsList" style="margin-top: 1.5rem; margin-bottom: 2rem;"></div>
 
       <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.75rem 0;">
 
-      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration de la Maquette Pédagogique (Par Semestre)</h3>
+      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration de la Maquette Pédagogique (Par Semestre & Promotion)</h3>
       <div id="ueBuilderList"></div>
       <button type="button" class="btn-secondary" onclick="ajouterUE()">+ Ajouter une Unité d'Enseignement (UE)</button>
       <br><br>
@@ -563,6 +616,7 @@
 
   </div>
 
+  <!-- MODALE D'ADMINISTRATION -->
   <div id="adminModal">
     <div class="modal-content">
       <div style="text-align: center; margin-bottom: 1.5rem;">
@@ -571,11 +625,13 @@
         <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Veuillez vous identifier :</p>
       </div>
 
+      <!-- Champ E-mail Admin avec ID distinct -->
       <div class="form-group" style="margin-bottom: 1rem;">
         <label for="adminEmailInput" style="font-size: 0.8rem; margin-bottom: 0.25rem;">E-mail Admin</label>
         <input type="email" id="adminEmailInput" placeholder="Entrez votre admin mail..." value="">
       </div>
 
+      <!-- Champ Mot de passe avec ID distinct -->
       <div class="form-group" style="margin-bottom: 1.25rem;">
         <label for="adminKeyInput" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Mot de passe</label>
         <input type="password" id="adminKeyInput" placeholder="Votre mot de passe...">
