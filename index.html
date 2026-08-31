@@ -586,7 +586,11 @@
     </div>
 
     <div id="adminPanelContainer" class="card">
-      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration des Étudiants (Par Promotion)</h3>
+      <!-- Bouton de déconnexion sécurisé ajouté en haut du panneau admin -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="margin:0; color:var(--primary);">Configuration des Étudiants (Par Promotion)</h3>
+        <button type="button" id="btnDeconnexion" class="btn-danger" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Se déconnecter</button>
+      </div>
       
       <!-- Grille corrigée pour éviter les cadres trop petits sur mobile -->
       <div class="admin-student-form-grid">
@@ -628,7 +632,7 @@
       <!-- Champ E-mail Admin avec ID distinct -->
       <div class="form-group" style="margin-bottom: 1rem;">
         <label for="adminEmailInput" style="font-size: 0.8rem; margin-bottom: 0.25rem;">E-mail Admin</label>
-        <input type="email" id="adminEmailInput" placeholder="Entrez votre admin mail..." value="">
+        <input type="email" id="adminEmailInput" placeholder="Entrez votre admin mail..." value=" ">
       </div>
 
       <!-- Champ Mot de passe avec ID distinct -->
@@ -669,6 +673,7 @@
       }
     }
 
+    // Sécurité renforcée : Initialisation sans persistance automatique au rechargement
     window.addEventListener('DOMContentLoaded', () => {
       mettreAJourSemestres();
     });
