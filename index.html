@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-RESULTAT NORMALIEN</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-hover: #1e40af;
+      --bg-main: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    /* En-tête, Logo & Bannière */
+    .app-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem 1rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      font-weight: 900;
+      font-size: 1.1rem;
+      width: 55px;
+      height: 55px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
+    }
+
+    .logo-icon span {
+      font-size: 0.6rem;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    .logo-text h1 {
+      font-size: 1.3rem;
+      color: var(--primary);
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-tagline {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .welcome-banner {
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .welcome-banner h2 {
+      font-size: 1.05rem;
+      color: var(--text-main);
+      margin: 0 0 0.4rem 0;
+      font-weight: 700;
+    }
+
+    .welcome-banner p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+      font-style: italic;
+    }
+
+    /* Navigation Modes */
+    .mode-selector {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active-tab {
+      background: var(--card-bg);
+      color: var(--primary);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* Cartes & Formulaires */
+    .card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: var(--text-main);
+    }
+
+    select, input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      background: #fff;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--danger);
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
+    /* Panneaux */
+    #adminPanelContainer {
+      display: none;
+      border: 2px dashed var(--primary);
+      background: #f8fafc;
+    }
+
+    #studentSection {
+      display: block;
+    }
+
+    .ue-builder-card {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .ue-builder-header {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .ec-builder-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      padding-left: 1rem;
+      align-items: center;
+    }
+
+    .ec-builder-row .ec-code { width: 110px; flex-shrink: 0; }
+    .ec-builder-row .ec-label { flex: 2; }
+
+    .student-item-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    /* Tableau Bulletin */
+    #bulletinContainer {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .academic-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      background: white;
+      font-size: 0.9rem;
+    }
+
+    .academic-table th, .academic-table td {
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+    }
+
+    .academic-table th {
+      background: #f1f5f9;
+      color: var(--text-main);
+      text-align: left;
+    }
+
+    .text-center { text-align: center; }
+    
+    .ue-row-header {
+      background: #f8fafc;
+      font-weight: bold;
+    }
+
+    .status-v { color: var(--success); font-weight: bold; }
+    .status-nv { color: var(--danger); font-weight: bold; }
+
+    /* Styles pour les cadres de statut du semestre */
+    .status-valide {
+      background-color: #28a745;
+      color: #ffffff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .status-non-valide {
+      background-color: #dc3545;
+      color: #ffffff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    .input-note {
+      width: 75px;
+      padding: 4px;
+      text-align: center;
+    }
+
+    .bulletin-header-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- En-tête / Logo et Message de Bienvenue -->
+    <header class="app-header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          ENS
+          <span>2026</span>
+        </div>
+        <div class="logo-text">
+          <h1>E-RESULTAT NORMALIEN</h1>
+          <span class="logo-tagline">Plateforme de Gestion Académique</span>
+        </div>
+      </div>
+      
+      <div class="welcome-banner">
+        <h2>BIENVENUE SUR LE E-RESULTAT NORMALIEN ✅</h2>
+        <p>Entrez vos informations et repartez avec vos résultats !</p>
+      </div>
+    </header>
+
+    <!-- Navigation Modes -->
+    <div class="mode-selector">
+      <button type="button" id="btnModeStudent" class="mode-btn active-tab" onclick="changerMode('student')">Espace Étudiant / Consultation</button>
+      <button type="button" id="btnAdminMode" class="mode-btn">Espace Administration</button>
+    </div>
+
+    <!-- Configuration globale (Filière / Niveau / Semestre) -->
+    <div class="card">
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="filiereSelect">Filière</label>
+          <select id="filiereSelect">
+            <option value="Anglais">Anglais</option>
+            <option value="Espagnol">Espagnol</option>
+            <option value="Lettres Modernes">Lettres Modernes</option>
+            <option value="Allemand">Allemand</option>
+            <option value="Histoire-Géographie">Histoire-Géographie</option>
+            <option value="Philosophie">Philosophie</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="anneeSelect">Niveau</label>
+          <select id="anneeSelect">
+            <option value="Licence 1">Licence 1</option>
+            <option value="Licence 2">Licence 2</option>
+            <option value="Licence 3">Licence 3</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="semestreSelect">Semestre</label>
+          <select id="semestreSelect">
+            <option value="Semestre 1">Semestre 1</option>
+            <option value="Semestre 2">Semestre 2</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESPACE ÉTUDIANT (Saisie du Matricule & Consultation) -->
+    <div id="studentSection" class="card">
+      <h3 style="margin-top:0; color:var(--primary);">Consulter votre Bulletin</h3>
+      <div class="form-group">
+        <label for="matriculeInput">Numéro de Matricule :</label>
+        <input type="text" id="matriculeInput" placeholder="Entrez votre matricule (ex: 24B123ENS)">
+      </div>
+      <button type="button" id="actionBtn" class="btn-primary">Consulter le bulletin</button>
+
+      <!-- BULLETIN / RÉSULTATS (Caché par défaut) -->
+      <div id="bulletinContainer">
+        <h3 style="text-align: center; color: var(--primary); margin-top: 0;">BULLETIN DE NOTES</h3>
+        <div class="bulletin-header-info">
+          <div><strong>Filière :</strong> <span id="resFiliere"></span></div>
+          <div><strong>Niveau :</strong> <span id="resNiveau"></span></div>
+          <div><strong>Semestre :</strong> <span id="resSemestre"></span></div>
+          <div><strong>Matricule :</strong> <span id="resMatricule"></span></div>
+          <div style="grid-column: span 2;"><strong>Nom & Prénoms :</strong> <span id="resNom"></span></div>
+        </div>
+
+        <div id="uesDynamicContainer"></div>
+
+        <div style="margin-top: 1rem; background: #f8fafc; padding: 1rem; border-radius: 8px; font-size: 0.95rem;">
+          <div><strong>Crédits Acquis :</strong> <span id="resCredits">0</span> / 30</div>
+          <div><strong>Pourcentage de validation :</strong> <span id="resPercentage">0%</span></div>
+          <div><strong>Moyenne Semestrielle :</strong> <span id="resSemestreAvg">0.00/20</span></div>
+          <div><strong>Statut du Semestre :</strong> <span id="resGlobalStatus">-</span></div>
+        </div>
+
+        <button type="button" id="saveChangesBtn" class="btn-primary" style="background-color: var(--success); margin-top: 1.5rem; display: none;">Enregistrer les notes de l'étudiant</button>
+      </div>
+    </div>
+
+    <!-- PANNEAU ADMINISTRATION (Caché par défaut) -->
+    <div id="adminPanelContainer" class="card">
+      <h3 style="margin-top:0; color:var(--primary);">Configuration des Étudiants (Global)</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Matricule</label>
+          <input type="text" id="newMatricule" placeholder="Ex: 24B123ENS">
+        </div>
+        <div class="form-group">
+          <label>Nom et Prénoms</label>
+          <input type="text" id="newNom" placeholder="Nom de l'étudiant">
+        </div>
+        <div class="form-group" style="display: flex; align-items: flex-end;">
+          <button type="button" class="btn-primary" id="addStudentBtn">+ Ajouter l'Étudiant</button>
+        </div>
+      </div>
+      <div id="adminStudentsList" style="margin-bottom: 2rem;"></div>
+
+      <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+
+      <h3 style="margin-top:0; color:var(--primary);">Configuration du Maquette Pédagogique (Par Semestre)</h3>
+      <div id="ueBuilderList"></div>
+      <button type="button" class="btn-secondary" onclick="ajouterUE()">+ Ajouter une Unité d'Enseignement (UE)</button>
+      <br><br>
+      <button type="button" class="btn-primary" onclick="sauvegarderDonneesVersSupabase()">Enregistrer toute la configuration</button>
+    </div>
+
+  </div>
+
+  <!-- Intégration du SDK Supabase via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Votre script JavaScript principal -->
+  <script src="main.js"></script>
+</body>
+</html>
