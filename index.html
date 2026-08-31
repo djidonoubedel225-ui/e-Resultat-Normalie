@@ -49,25 +49,28 @@
       margin-bottom: 1.2rem;
     }
 
+    /* Mise en valeur spécifique des lettres ERN */
     .logo-icon {
       background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
       color: white;
       font-weight: 900;
-      font-size: 1.1rem;
-      width: 55px;
-      height: 55px;
+      font-size: 1.2rem;
+      width: 60px;
+      height: 60px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(30, 58, 138, 0.4);
+      letter-spacing: 1px;
     }
 
     .logo-icon span {
-      font-size: 0.6rem;
-      font-weight: 400;
-      opacity: 0.9;
+      font-size: 0.55rem;
+      font-weight: 500;
+      opacity: 0.85;
+      letter-spacing: 0px;
     }
 
     .logo-text h1 {
@@ -76,6 +79,12 @@
       margin: 0;
       font-weight: 800;
       letter-spacing: 0.5px;
+    }
+
+    /* Style textuel pour accentuer ERN dans le titre si besoin */
+    .highlight-ern {
+      color: #3b82f6;
+      font-weight: 900;
     }
 
     .logo-tagline {
@@ -207,6 +216,15 @@
       font-size: 0.85rem;
     }
 
+    /* Message d'erreur personnalisé sans alert() */
+    .error-message {
+      color: var(--danger);
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-top: 6px;
+      display: none;
+    }
+
     /* Panneaux */
     #adminPanelContainer {
       display: none;
@@ -335,15 +353,15 @@
 
   <div class="container">
     
-    <!-- En-tête / Logo et Message de Bienvenue -->
+    <!-- En-tête / Logo et Message de Bienvenue (ERN mis en valeur) -->
     <header class="app-header">
       <div class="logo-container">
         <div class="logo-icon">
-          ENS
-          <span>2026</span>
+          ERN
+          <span>ENS</span>
         </div>
         <div class="logo-text">
-          <h1>E-RESULTAT NORMALIEN</h1>
+          <h1>E-RESULTAT <span class="highlight-ern">NORMALIEN</span></h1>
           <span class="logo-tagline">Plateforme de Gestion Académique</span>
         </div>
       </div>
@@ -356,7 +374,7 @@
 
     <!-- Navigation Modes -->
     <div class="mode-selector">
-      <button type="button" id="btnModeStudent" class="mode-btn active-tab" onclick="changerMode('student')">Espace Étudiant / Consultation</button>
+      <button type="button" id="btnModeStudent" class="mode-btn active-tab">Espace Étudiant / Consultation</button>
       <button type="button" id="btnAdminMode" class="mode-btn">Espace Administration</button>
     </div>
 
@@ -366,27 +384,34 @@
         <div class="form-group" style="margin-bottom:0;">
           <label for="filiereSelect">Filière</label>
           <select id="filiereSelect">
+            <option value="Allemand">Allemand</option>
             <option value="Anglais">Anglais</option>
             <option value="Espagnol">Espagnol</option>
-            <option value="Lettres Modernes">Lettres Modernes</option>
-            <option value="Allemand">Allemand</option>
             <option value="Histoire-Géographie">Histoire-Géographie</option>
+            <option value="Lettres Modernes">Lettres Modernes</option>
             <option value="Philosophie">Philosophie</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label for="anneeSelect">Niveau</label>
-          <select id="anneeSelect">
-            <option value="Licence 1">Licence 1</option>
-            <option value="Licence 2">Licence 2</option>
-            <option value="Licence 3">Licence 3</option>
+          <select id="anneeSelect" onchange="mettreAJourSemestres()">
+            <option value="BAPES 1">BAPES 1</option>
+            <option value="BAPES 2">BAPES 2</option>
+            <option value="BAPES 3">BAPES 3</option>
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label for="semestreSelect">Semestre</label>
           <select id="semestreSelect">
-            <option value="Semestre 1">Semestre 1</option>
-            <option value="Semestre 2">Semestre 2</option>
+            <!-- Semestres BAPES 1 -->
+            <option value="Semestre 1" data-niveau="BAPES 1">Semestre 1</option>
+            <option value="Semestre 2" data-niveau="BAPES 1">Semestre 2</option>
+            <!-- Semestres BAPES 2 -->
+            <option value="Semestre 3" data-niveau="BAPES 2">Semestre 3</option>
+            <option value="Semestre 4" data-niveau="BAPES 2">Semestre 4</option>
+            <!-- Semestres BAPES 3 -->
+            <option value="Semestre 5" data-niveau="BAPES 3">Semestre 5</option>
+            <option value="Semestre 6" data-niveau="BAPES 3">Semestre 6</option>
           </select>
         </div>
       </div>
@@ -394,12 +419,14 @@
 
     <!-- ESPACE ÉTUDIANT (Saisie du Matricule & Consultation) -->
     <div id="studentSection" class="card">
-      <h3 style="margin-top:0; color:var(--primary);">Consulter votre Bulletin</h3>
+      <h3 style="margin-top:0; color:var(--primary);">Consulter vos notes</h3>
       <div class="form-group">
         <label for="matriculeInput">Numéro de Matricule :</label>
-        <input type="text" id="matriculeInput" placeholder="Entrez votre matricule (ex: 24B123ENS)">
+        <input type="text" id="matriculeInput" placeholder="Entrez votre matricule (ex: 10000000)">
+        <!-- Élément d'affichage pour le message d'erreur personnalisé -->
+        <div id="messageErreur" class="error-message"></div>
       </div>
-      <button type="button" id="actionBtn" class="btn-primary">Consulter le bulletin</button>
+      <button type="button" id="actionBtn" class="btn-primary">Consulter votre résultat</button>
 
       <!-- BULLETIN / RÉSULTATS (Caché par défaut) -->
       <div id="bulletinContainer">
@@ -431,7 +458,7 @@
       <div class="form-row">
         <div class="form-group">
           <label>Matricule</label>
-          <input type="text" id="newMatricule" placeholder="Ex: 24B123ENS">
+          <input type="text" id="newMatricule" placeholder="Ex: 10000000">
         </div>
         <div class="form-group">
           <label>Nom et Prénoms</label>
@@ -445,7 +472,7 @@
 
       <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
 
-      <h3 style="margin-top:0; color:var(--primary);">Configuration du Maquette Pédagogique (Par Semestre)</h3>
+      <h3 style="margin-top:0; color:var(--primary);">Configuration de la Maquette Pédagogique (Par Semestre)</h3>
       <div id="ueBuilderList"></div>
       <button type="button" class="btn-secondary" onclick="ajouterUE()">+ Ajouter une Unité d'Enseignement (UE)</button>
       <br><br>
@@ -453,6 +480,55 @@
     </div>
 
   </div>
+
+  <!-- Modal Personnalisé pour l'Accès Administrateur -->
+  <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: var(--card-bg); padding: 2rem; border-radius: 16px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border);">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <div style="background: #e0e7ff; color: var(--primary); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; font-size: 1.25rem;">🔒</div>
+        <h3 style="margin: 0 0 0.5rem 0; color: var(--primary); font-size: 1.25rem;">Espace Administration</h3>
+        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Veuillez entrer la clé d'accès sécurisée :</p>
+      </div>
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <input type="password" id="adminKeyInput" placeholder="Votre clé secrète..." style="text-align: center; letter-spacing: 1px;">
+        <div id="adminModalError" class="error-message" style="text-align: center; margin-top: 6px;"></div>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" id="adminModalCancel" class="btn-secondary" style="flex: 1;">Annuler</button>
+        <button type="button" id="adminModalSubmit" class="btn-primary" style="flex: 1;">Valider</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script pour filtrer dynamiquement les semestres selon le niveau choisi -->
+  <script>
+    function mettreAJourSemestres() {
+      const niveauSelect = document.getElementById('anneeSelect');
+      const semestreSelect = document.getElementById('semestreSelect');
+      const niveauActuel = niveauSelect.value;
+
+      const options = semestreSelect.options;
+      let premierVisible = null;
+
+      for (let i = 0; i < options.length; i++) {
+        const opt = options[i];
+        if (opt.getAttribute('data-niveau') === niveauActuel) {
+          opt.style.display = 'block';
+          if (!premierVisible) premierVisible = opt.value;
+        } else {
+          opt.style.display = 'none';
+        }
+      }
+
+      if (premierVisible) {
+        semestreSelect.value = premierVisible;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      mettreAJourSemestres();
+    });
+  </script>
 
   <!-- Intégration du SDK Supabase via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
