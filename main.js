@@ -104,7 +104,7 @@ if (btnAdminMode && adminModal) {
     }
 
     adminModal.style.display = 'flex';
-    if (adminEmailInput && !adminEmailInput.value) adminEmailInput.value = " ";
+    if (adminEmailInput && !adminEmailInput.value) adminEmailInput.value = "admin@bapes.bj";
     if (adminKeyInput) adminKeyInput.value = '';
     if (adminModalError) adminModalError.style.display = 'none';
     if (adminEmailInput) {
@@ -182,14 +182,27 @@ if (adminModalSubmit) {
   }
 });
 
-// --- GESTION DE LA DÉCONNEXION SÉCURISÉE ---
+// --- GESTION DE LA DÉCONNEXION SÉCURISÉE (Corrigée pour GitHub Pages) ---
 const btnDeconnexion = document.getElementById('btnDeconnexion');
 if (btnDeconnexion) {
   btnDeconnexion.addEventListener('click', async () => {
-    if (_supabase) {
-      await _supabase.auth.signOut();
+    try {
+      if (_supabase) {
+        await _supabase.auth.signOut();
+      }
+    } catch (err) {
+      console.error("Erreur lors de la déconnexion Supabase :", err);
+    } finally {
+      // Nettoyage forcé du stockage local pour éviter les interférences sur GitHub Pages
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      currentMode = 'student';
+      window.location.reload(); 
     }
-    window.location.reload(); // Nettoie la session et recharge la page
   });
 }
 
