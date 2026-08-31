@@ -620,7 +620,7 @@ if (actionBtn) {
       const estPublie = donneesActuelles.publicationSemestres?.[anneeKey]?.[semestreKey] === true;
       
       if (!estPublie) {
-        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles (délibération en attente).");
+        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles.");
         document.getElementById('bulletinContainer').style.display = 'none';
         return;
       }
