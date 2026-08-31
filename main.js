@@ -15,7 +15,7 @@ try {
 
 let currentMode = 'student';
 
-// Structure de données globale par filière (BAPES, 6 semestres, publication et étudiants)
+// Structure de données globale par filière incluant explicitement le verrou de publication par semestre
 let donneesActuelles = {
   structureUEParNiveau: {
     "BAPES 1": { "Semestre 1": [], "Semestre 2": [] },
@@ -30,7 +30,7 @@ let donneesActuelles = {
   etudiants: []
 };
 
-// Fonction utilitaire pour gérer l'affichage de l'erreur du matricule sans alert()
+// Fonction utilitaire pour afficher les erreurs sans alert()
 function afficherErreurMatricule(message) {
   const messageBox = document.getElementById('messageErreur');
   if (messageBox) {
@@ -78,7 +78,6 @@ if (btnAdminMode && adminModal) {
   });
 }
 
-// Fermeture du modal Admin via "Annuler"
 if (adminModalCancel) {
   adminModalCancel.addEventListener('click', () => {
     adminModal.style.display = 'none';
@@ -87,16 +86,13 @@ if (adminModalCancel) {
   });
 }
 
-// Validation de l'authentification sécurisée via Supabase Auth
 if (adminModalSubmit) {
   adminModalSubmit.addEventListener('click', async () => {
     try {
-      // Récupération de l'e-mail (s'il existe dans le modal HTML) ou valeur par défaut
       const emailInput = document.getElementById('adminEmailInput');
       const emailAdmin = emailInput ? emailInput.value.trim() : "admin@bapes.bj";
       const passwordAdmin = adminKeyInput ? adminKeyInput.value.trim() : "";
 
-      // Appel sécurisé à Supabase Auth
       const { data, error } = await _supabase.auth.signInWithPassword({
         email: emailAdmin,
         password: passwordAdmin,
@@ -130,7 +126,6 @@ if (adminModalSubmit) {
   });
 }
 
-// Permettre la validation par la touche "Entrée"
 if (adminKeyInput) {
   adminKeyInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -139,7 +134,6 @@ if (adminKeyInput) {
   });
 }
 
-// Changements de filière, niveau ou semestre
 ['filiereSelect', 'anneeSelect', 'semestreSelect'].forEach(id => {
   const el = document.getElementById(id);
   if (el) {
@@ -154,7 +148,7 @@ if (adminKeyInput) {
   }
 });
 
-// --- 2. SYNCHRONISATION SUPABASE (GLOBAL PAR FILIÈRE) ---
+// --- 2. SYNCHRONISATION SUPABASE ---
 async function chargerDonneesDepuisSupabase() {
   if (!_supabase) return;
 
@@ -229,14 +223,14 @@ window.sauvegarderDonneesVersSupabase = async function() {
     if (error) {
       alert("Erreur lors de la synchronisation en ligne : " + error.message);
     } else {
-      alert("Données enregistrées en ligne avec succès pour toute la filière !");
+      alert("Configuration et état de publication enregistrés avec succès !");
     }
   } catch (err) {
     alert("Une erreur technique est survenue lors de l'enregistrement.");
   }
 };
 
-// --- 3. GESTION DES PROFILS ÉTUDIANTS ---
+// --- 3. GESTION DES ÉTUDIANTS ---
 const addStudentBtn = document.getElementById('addStudentBtn');
 if (addStudentBtn) {
   addStudentBtn.addEventListener('click', async () => {
@@ -303,30 +297,17 @@ function chargerListeEtudiantsAdmin() {
 
 window.modifierEtudiant = async function(index) {
   const etudiant = donneesActuelles.etudiants[index];
-  
-  const nouveauMatricule = prompt(`Modifier le matricule pour l'étudiant :`, etudiant.matricule);
+  const nouveauMatricule = prompt(`Modifier le matricule :`, etudiant.matricule);
   if (nouveauMatricule === null) return; 
   const matriculeNettoye = nouveauMatricule.trim();
   
-  if (!matriculeNettoye) {
-    alert("Le matricule ne peut pas être vide.");
-    return;
-  }
+  if (!matriculeNettoye) return alert("Le matricule ne peut pas être vide.");
 
-  const doublon = donneesActuelles.etudiants.some((e, i) => i !== index && e.matricule.toLowerCase() === matriculeNettoye.toLowerCase());
-  if (doublon) {
-    alert("Un autre étudiant possède déjà ce matricule dans cette filière.");
-    return;
-  }
-
-  const nouveauNom = prompt(`Modifier le nom et prénoms pour l'étudiant (${matriculeNettoye}) :`, etudiant.nom);
+  const nouveauNom = prompt(`Modifier le nom et prénoms :`, etudiant.nom);
   if (nouveauNom === null) return; 
   const nomNettoye = nouveauNom.trim();
   
-  if (!nomNettoye) {
-    alert("Le nom ne peut pas être vide.");
-    return;
-  }
+  if (!nomNettoye) return alert("Le nom ne peut pas être vide.");
 
   donneesActuelles.etudiants[index].matricule = matriculeNettoye;
   donneesActuelles.etudiants[index].nom = nomNettoye;
@@ -341,7 +322,7 @@ window.supprimerEtudiant = async function(index) {
   chargerListeEtudiantsAdmin();
 };
 
-// --- 4. CONFIGURATION DE LA MAQUETTE PÉDAGOGIQUE ET TABLEAU DE BORD STATS ---
+// --- 4. MAQUETTE PÉDAGOGIQUE & CONTRÔLE DE PUBLICATION ---
 function chargerInterfaceAdmin() {
   chargerInterfaceBuilder();
   chargerListeEtudiantsAdmin();
@@ -369,14 +350,14 @@ function chargerInterfaceBuilder() {
   
   let estPublie = !!donneesActuelles.publicationSemestres[annee][semestre];
 
-  // Option de publication
+  // Bloc visuel de l'option de publication du semestre
   const publicationBox = document.createElement('div');
   publicationBox.className = 'publication-control-box';
-  publicationBox.style.cssText = "background:var(--bg-card); padding:1rem; border-radius:8px; margin-bottom:1rem; border:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;";
+  publicationBox.style.cssText = "background: #fff; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.25rem; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm);";
   publicationBox.innerHTML = `
     <div>
-      <strong style="display:block; font-size:0.95rem;">Publication des résultats (${semestre} - ${annee})</strong>
-      <span style="font-size:0.8rem; color:var(--text-muted);">Cochez cette case pour rendre les résultats visibles aux étudiants après la délibération.</span>
+      <strong style="display:block; font-size:0.95rem; color:var(--primary);">Publication des résultats (${semestre} - ${annee})</strong>
+      <span style="font-size:0.8rem; color:var(--text-muted);">Cochez pour rendre les notes visibles aux étudiants. Décochez pour garder le secret.</span>
     </div>
     <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600;">
       <input type="checkbox" id="checkboxPublicationSemestre" ${estPublie ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;">
@@ -385,6 +366,7 @@ function chargerInterfaceBuilder() {
   `;
   container.appendChild(publicationBox);
 
+  // Écouteur direct pour capturer l'état de la case immédiatement
   const checkboxPub = publicationBox.querySelector('#checkboxPublicationSemestre');
   checkboxPub.addEventListener('change', (e) => {
     if (!donneesActuelles.publicationSemestres[annee]) {
@@ -400,15 +382,12 @@ function chargerInterfaceBuilder() {
 }
 
 window.ajouterUE = function() {
+  capturerDonneesBuilderEnCours();
   const annee = document.getElementById('anneeSelect').value;
   const semestre = document.getElementById('semestreSelect').value;
 
-  if (!donneesActuelles.structureUEParNiveau[annee]) {
-    donneesActuelles.structureUEParNiveau[annee] = {};
-  }
-  if (!donneesActuelles.structureUEParNiveau[annee][semestre]) {
-    donneesActuelles.structureUEParNiveau[annee][semestre] = [];
-  }
+  if (!donneesActuelles.structureUEParNiveau[annee]) donneesActuelles.structureUEParNiveau[annee] = {};
+  if (!donneesActuelles.structureUEParNiveau[annee][semestre]) donneesActuelles.structureUEParNiveau[annee][semestre] = [];
 
   donneesActuelles.structureUEParNiveau[annee][semestre].push({
     nomUE: `UE${donneesActuelles.structureUEParNiveau[annee][semestre].length + 1}`,
@@ -430,7 +409,7 @@ function ajouterLigneUEBuilder(ueData, ueIndex) {
   ueData.ecs.forEach((ec, ecIndex) => {
     ecsHtml += `
       <div class="ec-builder-row">
-        <input type="text" class="ec-code" placeholder="Code EC (ex: EC1)" value="${ec.nom}">
+        <input type="text" class="ec-code" placeholder="Code (ex: EC1)" value="${ec.nom}">
         <input type="text" class="ec-label" placeholder="Libellé de l'élément constitutif" value="${ec.label}">
         <button type="button" class="btn-danger" onclick="supprimerEC(${ueIndex}, ${ecIndex})">X</button>
       </div>
@@ -504,9 +483,12 @@ function capturerDonneesBuilderEnCours() {
 
   const annee = document.getElementById('anneeSelect').value;
   const semestre = document.getElementById('semestreSelect').value;
+  
+  if (!donneesActuelles.structureUEParNiveau) donneesActuelles.structureUEParNiveau = {};
   if (!donneesActuelles.structureUEParNiveau[annee]) donneesActuelles.structureUEParNiveau[annee] = {};
   donneesActuelles.structureUEParNiveau[annee][semestre] = nouvelleStructure;
 
+  // Capture fiable et prioritaire de la case à cocher de publication
   const checkboxPub = document.getElementById('checkboxPublicationSemestre');
   if (checkboxPub) {
     if (!donneesActuelles.publicationSemestres) donneesActuelles.publicationSemestres = {};
@@ -515,7 +497,6 @@ function capturerDonneesBuilderEnCours() {
   }
 }
 
-// Fonction de calcul des statistiques pour le tableau de bord administrateur
 function calculerEtAfficherStatistiquesAdmin() {
   const annee = document.getElementById('anneeSelect').value;
   const semestre = document.getElementById('semestreSelect').value;
@@ -587,15 +568,15 @@ function afficherOuMettreAJourBlocStats(stats) {
   }
 
   statsContainer.innerHTML = `
-    <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+    <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); text-align: center;">
       <span style="display:block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Évalués</span>
       <strong style="font-size: 1.25rem;">${stats.total}</strong>
     </div>
-    <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+    <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); text-align: center;">
       <span style="display:block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Taux de réussite</span>
-      <strong style="font-size: 1.25rem; color: #10b981;">${stats.taux}%</strong>
+      <strong style="font-size: 1.25rem; color: #16a34a;">${stats.taux}%</strong>
     </div>
-    <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+    <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); text-align: center;">
       <span style="display:block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Moyenne de classe</span>
       <strong style="font-size: 1.25rem;">${stats.moyenne}/20</strong>
     </div>
@@ -607,7 +588,7 @@ function supprimerBlocStatsIfExists() {
   if (statsContainer) statsContainer.remove();
 }
 
-// --- 5. CONSULTATION ET SAISIE DES NOTES ---
+// --- 5. CONSULTATION ÉTUDIANTE & FILTRE DE SÉCURITÉ ---
 const actionBtn = document.getElementById('actionBtn');
 if (actionBtn) {
   actionBtn.addEventListener('click', async () => {
@@ -621,6 +602,7 @@ if (actionBtn) {
       return;
     }
 
+    // Récupération fraîche des données en ligne
     await chargerDonneesDepuisSupabase();
 
     let etudiant = donneesActuelles.etudiants.find(e => e.matricule.toLowerCase() === matricule.toLowerCase());
@@ -630,36 +612,28 @@ if (actionBtn) {
       return;
     }
 
-    afficherErreurMatricule("");
-
     const anneeKey = document.getElementById('anneeSelect').value;
     const semestreKey = document.getElementById('semestreSelect').value;
 
+    // VÉRIFICATION STRICTE DE LA PUBLICATION CÔTÉ ÉTUDIANT
+    if (currentMode !== 'admin') {
+      const estPublie = donneesActuelles.publicationSemestres?.[anneeKey]?.[semestreKey] === true;
+      
+      if (!estPublie) {
+        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles (délibération en attente).");
+        document.getElementById('bulletinContainer').style.display = 'none';
+        return;
+      }
+    }
+
     const structureSemestre = donneesActuelles.structureUEParNiveau?.[anneeKey]?.[semestreKey] || [];
     if(structureSemestre.length === 0) {
-      afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
+      afficherErreurMatricule("Aucune maquette pédagogique configurée pour ce semestre.");
       document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
 
-    if (currentMode !== 'admin') {
-      const estPublie = donneesActuelles.publicationSemestres?.[anneeKey]?.[semestreKey] === true;
-      if (!estPublie) {
-        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles.");
-        document.getElementById('bulletinContainer').style.display = 'none';
-        return;
-      }
-
-      const notesSemestre = etudiant.notes?.[anneeKey]?.[semestreKey] || {};
-      const nombreNotesSaisies = Object.keys(notesSemestre).length;
-      const sommeNotes = Object.values(notesSemestre).reduce((acc, val) => acc + (parseFloat(val) || 0), 0);
-
-      if (nombreNotesSaisies === 0 || sommeNotes === 0) {
-        afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
-        document.getElementById('bulletinContainer').style.display = 'none';
-        return;
-      }
-    }
+    afficherErreurMatricule("");
 
     const filiereSelect = document.getElementById('filiereSelect');
     const filiereTexte = filiereSelect ? filiereSelect.options[filiereSelect.selectedIndex].text : "";
@@ -679,18 +653,17 @@ function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
   if (!container) return;
   
   let tableHTML = `
-    <div class="table-responsive">
-      <table class="academic-table">
-        <thead>
-          <tr>
-            <th>Unité d'Enseignement (UE) / Élément Constitutif (EC)</th>
-            <th class="text-center">Crédits</th>
-            <th class="text-center">Notes</th>
-            <th class="text-center">Moy. UE</th>
-            <th class="text-center">Statut</th>
-          </tr>
-        </thead>
-        <tbody>
+    <table class="academic-table">
+      <thead>
+        <tr>
+          <th>Unité d'Enseignement (UE) / Élément Constitutif (EC)</th>
+          <th class="text-center">Crédits</th>
+          <th class="text-center">Notes</th>
+          <th class="text-center">Moy. UE</th>
+          <th class="text-center">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
   `;
 
   let totalCreditsAcquired = 0;
@@ -755,7 +728,7 @@ function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
     `;
   });
 
-  tableHTML += `</tbody></table></div>`;
+  tableHTML += `</tbody></table>`;
   container.innerHTML = tableHTML;
 
   let moyenneSemestrielle = totalWeightedScores / totalSemestreCredits;
