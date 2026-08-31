@@ -51,10 +51,19 @@ function afficherErreurMatricule(message) {
   }
 }
 
-// --- INITIALISATION AU CHARGEMENT DE LA PAGE ---
+// --- INITIALISATION AU CHARGEMENT DE LA PAGE (Avec vérification de session persistante) ---
 window.addEventListener('DOMContentLoaded', async () => {
-  mettreAJourSemestres();
-  await verifierSessionAdmin();
+  if (typeof mettreAJourSemestres === 'function') {
+    mettreAJourSemestres();
+  }
+
+  // Vérifie si une session admin est déjà active dans le stockage local du navigateur
+  if (_supabase) {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session) {
+      basculerModeAdminReussi();
+    }
+  }
 });
 
 // --- 1. GESTION DES MODES (ÉTUDIANT / ADMIN) ---
@@ -84,9 +93,18 @@ const adminModalCancel = document.getElementById('adminModalCancel');
 const adminModalSubmit = document.getElementById('adminModalSubmit');
 
 if (btnAdminMode && adminModal) {
-  btnAdminMode.addEventListener('click', () => {
+  btnAdminMode.addEventListener('click', async () => {
+    // Si déjà connecté, un clic sur le bouton Admin réaffiche simplement le panneau sans redemander le mot de passe
+    if (_supabase) {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session) {
+        basculerModeAdminReussi();
+        return;
+      }
+    }
+
     adminModal.style.display = 'flex';
-    if (adminEmailInput && !adminEmailInput.value) adminEmailInput.value = "admin@bapes.bj";
+    if (adminEmailInput && !adminEmailInput.value) adminEmailInput.value = " ";
     if (adminKeyInput) adminKeyInput.value = '';
     if (adminModalError) adminModalError.style.display = 'none';
     if (adminEmailInput) {
@@ -100,8 +118,10 @@ if (btnAdminMode && adminModal) {
 if (adminModalCancel) {
   adminModalCancel.addEventListener('click', () => {
     adminModal.style.display = 'none';
-    if (btnModeStudent) btnModeStudent.classList.add('active-tab');
-    if (btnAdminMode) btnAdminMode.classList.remove('active-tab');
+    if (currentMode !== 'admin') {
+      if (btnModeStudent) btnModeStudent.classList.add('active-tab');
+      if (btnAdminMode) btnAdminMode.classList.remove('active-tab');
+    }
   });
 }
 
@@ -131,7 +151,7 @@ async function executerConnexionAdmin() {
 
 function basculerModeAdminReussi() {
   currentMode = 'admin';
-  adminModal.style.display = 'none';
+  if (adminModal) adminModal.style.display = 'none';
   
   if (btnAdminMode) btnAdminMode.classList.add('active-tab');
   if (btnModeStudent) btnModeStudent.classList.remove('active-tab');
@@ -162,17 +182,15 @@ if (adminModalSubmit) {
   }
 });
 
-// Vérification de session active au démarrage
-async function verifierSessionAdmin() {
-  if (!_supabase) return;
-  try {
-    const { data: { session } } = await _supabase.auth.getSession();
-    if (session) {
-      basculerModeAdminReussi();
+// --- GESTION DE LA DÉCONNEXION SÉCURISÉE ---
+const btnDeconnexion = document.getElementById('btnDeconnexion');
+if (btnDeconnexion) {
+  btnDeconnexion.addEventListener('click', async () => {
+    if (_supabase) {
+      await _supabase.auth.signOut();
     }
-  } catch (err) {
-    console.error("Erreur lors de la vérification de session :", err);
-  }
+    window.location.reload(); // Nettoie la session et recharge la page
+  });
 }
 
 // Écouteurs de changement sur TOUS les sélecteurs de filtres
