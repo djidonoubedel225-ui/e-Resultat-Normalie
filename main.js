@@ -15,7 +15,7 @@ try {
 
 let currentMode = 'student';
 
-// Structure de données globale par filière incluant explicitement le verrou de publication par semestre
+// Structure de données globale incluant le verrou de publication et le mode rattrapage par UE
 let donneesActuelles = {
   structureUEParNiveau: {
     "BAPES 1": { "Semestre 1": [], "Semestre 2": [] },
@@ -29,6 +29,13 @@ let donneesActuelles = {
   },
   etudiants: []
 };
+
+// Fonction utilitaire pour générer la clé unique par Filière et par Promotion
+function obtenirCleSupabase() {
+  const filiere = document.getElementById('filiereSelect')?.value || 'Allemand';
+  const promotion = document.getElementById('promotionSelect')?.value || '17ème Promotion';
+  return `${filiere} - ${promotion}`;
+}
 
 // Fonction utilitaire pour afficher les erreurs sans alert()
 function afficherErreurMatricule(message) {
@@ -44,6 +51,12 @@ function afficherErreurMatricule(message) {
   }
 }
 
+// --- INITIALISATION AU CHARGEMENT DE LA PAGE ---
+window.addEventListener('DOMContentLoaded', async () => {
+  mettreAJourSemestres();
+  await verifierSessionAdmin();
+});
+
 // --- 1. GESTION DES MODES (ÉTUDIANT / ADMIN) ---
 const btnModeStudent = document.getElementById('btnModeStudent');
 if (btnModeStudent) {
@@ -54,7 +67,7 @@ if (btnModeStudent) {
     const btnAdmin = document.getElementById('btnAdminMode');
     if (btnAdmin) btnAdmin.classList.remove('active-tab');
     
-    document.getElementById('actionBtn').textContent = "Consulter le bulletin";
+    document.getElementById('actionBtn').textContent = "Accédez à vos résultats";
     document.getElementById('adminPanelContainer').style.display = 'none';
     document.getElementById('saveChangesBtn').style.display = 'none';
     document.getElementById('bulletinContainer').style.display = 'none';
@@ -64,6 +77,7 @@ if (btnModeStudent) {
 
 const btnAdminMode = document.getElementById('btnAdminMode');
 const adminModal = document.getElementById('adminModal');
+const adminEmailInput = document.getElementById('adminEmailInput');
 const adminKeyInput = document.getElementById('adminKeyInput');
 const adminModalError = document.getElementById('adminModalError');
 const adminModalCancel = document.getElementById('adminModalCancel');
@@ -72,9 +86,14 @@ const adminModalSubmit = document.getElementById('adminModalSubmit');
 if (btnAdminMode && adminModal) {
   btnAdminMode.addEventListener('click', () => {
     adminModal.style.display = 'flex';
+    if (adminEmailInput && !adminEmailInput.value) adminEmailInput.value = "admin@bapes.bj";
     if (adminKeyInput) adminKeyInput.value = '';
     if (adminModalError) adminModalError.style.display = 'none';
-    if (adminKeyInput) adminKeyInput.focus();
+    if (adminEmailInput) {
+      adminEmailInput.focus();
+    } else if (adminKeyInput) {
+      adminKeyInput.focus();
+    }
   });
 }
 
@@ -86,55 +105,78 @@ if (adminModalCancel) {
   });
 }
 
-if (adminModalSubmit) {
-  adminModalSubmit.addEventListener('click', async () => {
-    try {
-      const emailInput = document.getElementById('adminEmailInput');
-      const emailAdmin = emailInput ? emailInput.value.trim() : "admin@bapes.bj";
-      const passwordAdmin = adminKeyInput ? adminKeyInput.value.trim() : "";
+async function executerConnexionAdmin() {
+  try {
+    const emailAdmin = adminEmailInput ? adminEmailInput.value.trim() : "admin@bapes.bj";
+    const passwordAdmin = adminKeyInput ? adminKeyInput.value.trim() : "";
 
-      const { data, error } = await _supabase.auth.signInWithPassword({
-        email: emailAdmin,
-        password: passwordAdmin,
-      });
+    const { data, error } = await _supabase.auth.signInWithPassword({
+      email: emailAdmin,
+      password: passwordAdmin,
+    });
 
-      if (error || !data.session) {
-        if (adminModalError) {
-          adminModalError.textContent = "Identifiants administrateur incorrects !";
-          adminModalError.style.display = 'block';
-        }
-        if (adminKeyInput) adminKeyInput.focus();
-      } else {
-        currentMode = 'admin';
-        adminModal.style.display = 'none';
-        
-        if (btnAdminMode) btnAdminMode.classList.add('active-tab');
-        if (btnModeStudent) btnModeStudent.classList.remove('active-tab');
-        
-        document.getElementById('actionBtn').textContent = "Charger les notes de l'étudiant";
-        document.getElementById('adminPanelContainer').style.display = 'block';
-        document.getElementById('saveChangesBtn').style.display = 'block';
-        document.getElementById('bulletinContainer').style.display = 'none';
-        afficherErreurMatricule('');
-        
-        await chargerDonneesDepuisSupabase();
-        chargerInterfaceAdmin();
+    if (error || !data.session) {
+      if (adminModalError) {
+        adminModalError.textContent = "Identifiants administrateur incorrects !";
+        adminModalError.style.display = 'block';
       }
-    } catch (err) {
-      console.error("Erreur d'authentification :", err);
+      if (adminKeyInput) adminKeyInput.focus();
+    } else {
+      basculerModeAdminReussi();
     }
+  } catch (err) {
+    console.error("Erreur d'authentification :", err);
+  }
+}
+
+function basculerModeAdminReussi() {
+  currentMode = 'admin';
+  adminModal.style.display = 'none';
+  
+  if (btnAdminMode) btnAdminMode.classList.add('active-tab');
+  if (btnModeStudent) btnModeStudent.classList.remove('active-tab');
+  
+  document.getElementById('actionBtn').textContent = "Charger les notes de l'étudiant";
+  document.getElementById('adminPanelContainer').style.display = 'block';
+  document.getElementById('saveChangesBtn').style.display = 'block';
+  document.getElementById('bulletinContainer').style.display = 'none';
+  afficherErreurMatricule('');
+  
+  chargerDonneesDepuisSupabase().then(() => {
+    chargerInterfaceAdmin();
   });
 }
 
-if (adminKeyInput) {
-  adminKeyInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      adminModalSubmit.click();
-    }
-  });
+if (adminModalSubmit) {
+  adminModalSubmit.addEventListener('click', executerConnexionAdmin);
 }
 
-['filiereSelect', 'anneeSelect', 'semestreSelect'].forEach(id => {
+// Gestion de la touche Entrée sur les champs du modal admin
+[adminEmailInput, adminKeyInput].forEach(input => {
+  if (input) {
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        executerConnexionAdmin();
+      }
+    });
+  }
+});
+
+// Vérification de session active au démarrage
+async function verifierSessionAdmin() {
+  if (!_supabase) return;
+  try {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session) {
+      basculerModeAdminReussi();
+    }
+  } catch (err) {
+    console.error("Erreur lors de la vérification de session :", err);
+  }
+}
+
+// Écouteurs de changement sur TOUS les sélecteurs de filtres
+['filiereSelect', 'promotionSelect', 'anneeSelect', 'semestreSelect'].forEach(id => {
   const el = document.getElementById(id);
   if (el) {
     el.addEventListener('change', async () => {
@@ -152,13 +194,13 @@ if (adminKeyInput) {
 async function chargerDonneesDepuisSupabase() {
   if (!_supabase) return;
 
-  const filiere = document.getElementById('filiereSelect').value;
+  const cleFilierePromotion = obtenirCleSupabase();
 
   try {
     const { data, error } = await _supabase
       .from('academic_data')
       .select('content')
-      .eq('filiere', filiere)
+      .eq('filiere', cleFilierePromotion)
       .maybeSingle();
 
     if (error || !data || !data.content) {
@@ -208,10 +250,10 @@ window.sauvegarderDonneesVersSupabase = async function() {
     return;
   }
 
-  const filiere = document.getElementById('filiereSelect').value;
+  const cleFilierePromotion = obtenirCleSupabase();
 
   const payload = {
-    filiere: filiere,
+    filiere: cleFilierePromotion,
     content: donneesActuelles
   };
 
@@ -248,7 +290,7 @@ if (addStudentBtn) {
     }
 
     if (donneesActuelles.etudiants.some(e => e.matricule.toLowerCase() === matricule.toLowerCase())) {
-      alert("Un étudiant avec ce matricule existe déjà dans cette filière.");
+      alert("Un étudiant avec ce matricule existe déjà dans cette promotion.");
       return;
     }
 
@@ -256,6 +298,11 @@ if (addStudentBtn) {
       matricule,
       nom,
       notes: {
+        "BAPES 1": { "Semestre 1": {}, "Semestre 2": {} },
+        "BAPES 2": { "Semestre 3": {}, "Semestre 4": {} },
+        "BAPES 3": { "Semestre 5": {}, "Semestre 6": {} }
+      },
+      rattrapages: {
         "BAPES 1": { "Semestre 1": {}, "Semestre 2": {} },
         "BAPES 2": { "Semestre 3": {}, "Semestre 4": {} },
         "BAPES 3": { "Semestre 5": {}, "Semestre 6": {} }
@@ -277,7 +324,7 @@ function chargerListeEtudiantsAdmin() {
   listContainer.innerHTML = '';
 
   if (donneesActuelles.etudiants.length === 0) {
-    listContainer.innerHTML = `<span style="font-size:0.85rem; color:var(--text-muted);">Aucun étudiant enregistré dans cette filière.</span>`;
+    listContainer.innerHTML = `<span style="font-size:0.85rem; color:var(--text-muted);">Aucun étudiant enregistré dans cette promotion.</span>`;
     return;
   }
 
@@ -350,7 +397,6 @@ function chargerInterfaceBuilder() {
   
   let estPublie = !!donneesActuelles.publicationSemestres[annee][semestre];
 
-  // Bloc visuel de l'option de publication du semestre
   const publicationBox = document.createElement('div');
   publicationBox.className = 'publication-control-box';
   publicationBox.style.cssText = "background: #fff; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.25rem; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm);";
@@ -366,7 +412,6 @@ function chargerInterfaceBuilder() {
   `;
   container.appendChild(publicationBox);
 
-  // Écouteur direct pour capturer l'état de la case immédiatement
   const checkboxPub = publicationBox.querySelector('#checkboxPublicationSemestre');
   checkboxPub.addEventListener('change', (e) => {
     if (!donneesActuelles.publicationSemestres[annee]) {
@@ -488,7 +533,6 @@ function capturerDonneesBuilderEnCours() {
   if (!donneesActuelles.structureUEParNiveau[annee]) donneesActuelles.structureUEParNiveau[annee] = {};
   donneesActuelles.structureUEParNiveau[annee][semestre] = nouvelleStructure;
 
-  // Capture fiable et prioritaire de la case à cocher de publication
   const checkboxPub = document.getElementById('checkboxPublicationSemestre');
   if (checkboxPub) {
     if (!donneesActuelles.publicationSemestres) donneesActuelles.publicationSemestres = {};
@@ -515,6 +559,7 @@ function calculerEtAfficherStatistiquesAdmin() {
 
   etudiants.forEach(etudiant => {
     const notesSemestre = etudiant.notes?.[annee]?.[semestre] || {};
+    const rattrapagesSemestre = etudiant.rattrapages?.[annee]?.[semestre] || {};
     const nombreNotes = Object.keys(notesSemestre).length;
     
     if (nombreNotes > 0) {
@@ -529,6 +574,12 @@ function calculerEtAfficherStatistiquesAdmin() {
         });
 
         let moyenneUE = ue.ecs.length > 0 ? sommeNotesUE / ue.ecs.length : 0;
+        
+        let estEnRattrapage = !!rattrapagesSemestre[ue.nomUE];
+        if (estEnRattrapage && moyenneUE > 12.00) {
+          moyenneUE = 12.00;
+        }
+
         if (moyenneUE >= 10) totalCreditsAcquis += ue.credit;
         totalWeightedScores += moyenneUE * ue.credit;
       });
@@ -602,12 +653,11 @@ if (actionBtn) {
       return;
     }
 
-    // Récupération fraîche des données en ligne
     await chargerDonneesDepuisSupabase();
 
     let etudiant = donneesActuelles.etudiants.find(e => e.matricule.toLowerCase() === matricule.toLowerCase());
     if (!etudiant) {
-      afficherErreurMatricule("Aucun(e) Étudiant(e) Identifié(e) !");
+      afficherErreurMatricule("Aucun(e) Étudiant(e) Identifié(e) dans cette promotion !");
       document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
@@ -615,12 +665,11 @@ if (actionBtn) {
     const anneeKey = document.getElementById('anneeSelect').value;
     const semestreKey = document.getElementById('semestreSelect').value;
 
-    // VÉRIFICATION STRICTE DE LA PUBLICATION CÔTÉ ÉTUDIANT
     if (currentMode !== 'admin') {
       const estPublie = donneesActuelles.publicationSemestres?.[anneeKey]?.[semestreKey] === true;
       
       if (!estPublie) {
-        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles.");
+        afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles (délibération en attente).");
         document.getElementById('bulletinContainer').style.display = 'none';
         return;
       }
@@ -628,7 +677,7 @@ if (actionBtn) {
 
     const structureSemestre = donneesActuelles.structureUEParNiveau?.[anneeKey]?.[semestreKey] || [];
     if(structureSemestre.length === 0) {
-      afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
+      afficherErreurMatricule("Aucune maquette pédagogique configurée pour ce semestre.");
       document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
@@ -637,13 +686,16 @@ if (actionBtn) {
 
     const filiereSelect = document.getElementById('filiereSelect');
     const filiereTexte = filiereSelect ? filiereSelect.options[filiereSelect.selectedIndex].text : "";
+    
+    const promoSelect = document.getElementById('promotionSelect');
+    const promoTexte = promoSelect ? promoSelect.options[promoSelect.selectedIndex].text : "";
 
-    afficherBulletin(filiereTexte, anneeKey, semestreKey, structureSemestre, etudiant);
+    afficherBulletin(filiereTexte, promoTexte, anneeKey, semestreKey, structureSemestre, etudiant);
   });
 }
 
-function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
-  document.getElementById('resFiliere').textContent = nomFiliere;
+function afficherBulletin(nomFiliere, nomPromotion, annee, semestre, structureUE, etudiant) {
+  document.getElementById('resFiliere').textContent = `${nomFiliere} (${nomPromotion})`;
   document.getElementById('resNiveau').textContent = annee;
   document.getElementById('resSemestre').textContent = semestre;
   document.getElementById('resMatricule').textContent = etudiant.matricule;
@@ -674,6 +726,11 @@ function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
   if (!etudiant.notes[annee]) etudiant.notes[annee] = {};
   if (!etudiant.notes[annee][semestre]) etudiant.notes[annee][semestre] = {};
   const notesSemestre = etudiant.notes[annee][semestre];
+
+  if (!etudiant.rattrapages) etudiant.rattrapages = {};
+  if (!etudiant.rattrapages[annee]) etudiant.rattrapages[annee] = {};
+  if (!etudiant.rattrapages[annee][semestre]) etudiant.rattrapages[annee][semestre] = {};
+  const rattrapagesSemestre = etudiant.rattrapages[annee][semestre];
 
   structureUE.forEach(ue => {
     let sommeNotesUE = 0;
@@ -708,6 +765,12 @@ function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
     });
 
     let moyenneUE = ue.ecs.length > 0 ? sommeNotesUE / ue.ecs.length : 0;
+    
+    let estEnRattrapage = !!rattrapagesSemestre[ue.nomUE];
+    if (estEnRattrapage && moyenneUE > 12.00) {
+      moyenneUE = 12.00;
+    }
+
     let estValide = moyenneUE >= 10;
 
     if (estValide) totalCreditsAcquired += ue.credit;
@@ -716,9 +779,22 @@ function afficherBulletin(nomFiliere, annee, semestre, structureUE, etudiant) {
     let statutV_NV = estValide ? "V" : "NV";
     let statusClass = estValide ? "status-v" : "status-nv";
 
+    let rattrapageCheckboxHTML = "";
+    if (currentMode === 'admin') {
+      rattrapageCheckboxHTML = `
+        <div class="rattrapage-container">
+          <input type="checkbox" class="rattrapage-checkbox" data-ue="${ue.nomUE}" ${estEnRattrapage ? 'checked' : ''}>
+          <span>Session Rattrapage (Plafond 12)</span>
+        </div>
+      `;
+    }
+
     tableHTML += `
       <tr class="ue-row-header">
-        <td>${ue.nomUE} : ${ue.libelle}</td>
+        <td>
+          ${ue.nomUE} : ${ue.libelle}
+          ${rattrapageCheckboxHTML}
+        </td>
         <td class="text-center">${ue.credit}</td>
         <td></td>
         <td class="text-center">${moyenneUE.toFixed(2)}</td>
@@ -781,13 +857,26 @@ if (saveChangesBtn) {
         etudiant.notes[anneeKey][semestreKey][ecNom] = parseFloat(input.value) || 0;
       });
 
+      if (!etudiant.rattrapages) etudiant.rattrapages = {};
+      if (!etudiant.rattrapages[anneeKey]) etudiant.rattrapages[anneeKey] = {};
+      if (!etudiant.rattrapages[anneeKey][semestreKey]) etudiant.rattrapages[anneeKey][semestreKey] = {};
+
+      document.querySelectorAll('.rattrapage-checkbox').forEach(checkbox => {
+        let ueNom = checkbox.getAttribute('data-ue');
+        etudiant.rattrapages[anneeKey][semestreKey][ueNom] = checkbox.checked;
+      });
+
       await sauvegarderDonneesVersSupabase();
       
       const filiereSelect = document.getElementById('filiereSelect');
       const filiereTexte = filiereSelect ? filiereSelect.options[filiereSelect.selectedIndex].text : "";
+      
+      const promoSelect = document.getElementById('promotionSelect');
+      const promoTexte = promoSelect ? promoSelect.options[promoSelect.selectedIndex].text : "";
+
       const structureSemestre = donneesActuelles.structureUEParNiveau[anneeKey][semestreKey];
       
-      afficherBulletin(filiereTexte, anneeKey, semestreKey, structureSemestre, etudiant);
+      afficherBulletin(filiereTexte, promoTexte, anneeKey, semestreKey, structureSemestre, etudiant);
       calculerEtAfficherStatistiquesAdmin();
     }
   });
