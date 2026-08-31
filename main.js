@@ -628,7 +628,7 @@ if (actionBtn) {
 
     const structureSemestre = donneesActuelles.structureUEParNiveau?.[anneeKey]?.[semestreKey] || [];
     if(structureSemestre.length === 0) {
-      afficherErreurMatricule("Aucune maquette pédagogique configurée pour ce semestre.");
+      afficherErreurMatricule("Aucun résultat disponible pour ce semestre !");
       document.getElementById('bulletinContainer').style.display = 'none';
       return;
     }
