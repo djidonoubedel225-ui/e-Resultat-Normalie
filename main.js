@@ -193,7 +193,7 @@ window.addEventListener('keydown', (event) => {
 
 async function executerConnexionAdmin() {
   try {
-    const emailAdmin = adminEmailInput ? adminEmailInput.value.trim() : "admin@bapes.bj";
+    const emailAdmin = adminEmailInput ? adminEmailInput.value.trim() : "";
     const passwordAdmin = adminKeyInput ? adminKeyInput.value.trim() : "";
 
     const { data, error } = await _supabase.auth.signInWithPassword({
