@@ -626,14 +626,14 @@ function calculerEtAfficherStatistiquesAdmin() {
           moyenneUE = 12.00;
         }
 
-        if (moyenneUE >= 10) totalCreditsAcquis += ue.credit;
+        if (moyenneUE >= 12) totalCreditsAcquis += ue.credit;
         totalWeightedScores += moyenneUE * ue.credit;
       });
 
       let moyenneSemestrielle = totalWeightedScores / totalSemestreCredits;
       sommeMoyennesClasse += moyenneSemestrielle;
 
-      if (totalCreditsAcquis >= 24 && moyenneSemestrielle >= 10) {
+      if (totalCreditsAcquis >= 24) {
         totalAdmis++;
       }
     }
@@ -817,7 +817,7 @@ function afficherBulletin(nomFiliere, nomPromotion, annee, semestre, structureUE
       moyenneUE = 12.00;
     }
 
-    let estValide = moyenneUE >= 10;
+    let estValide = moyenneUE >= 12;
 
     if (estValide) totalCreditsAcquired += ue.credit;
     totalWeightedScores += moyenneUE * ue.credit;
@@ -859,7 +859,7 @@ function afficherBulletin(nomFiliere, nomPromotion, annee, semestre, structureUE
   let statutGlobalText = "NON VALIDÉ";
   let statutClassStyle = "status-non-valide";
 
-  if (totalCreditsAcquired === 30 && moyenneSemestrielle >= 10) {
+  if (totalCreditsAcquired === 30 && moyenneSemestrielle >= 12) {
     statutGlobalText = "VALIDÉ";
     statutClassStyle = "status-valide";
   } else if (totalCreditsAcquired >= 24) {
