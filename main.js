@@ -152,7 +152,7 @@ if (btnAdminMode && adminModal) {
     }
 
     adminModal.style.display = 'flex';
-    if (adminEmailInput && !adminEmailInput.value.trim()) adminEmailInput.value = "admin@bapes.bj";
+    if (adminEmailInput && !adminEmailInput.value.trim()) adminEmailInput.value = " ";
     if (adminKeyInput) adminKeyInput.value = '';
     if (adminModalError) adminModalError.style.display = 'none';
     
