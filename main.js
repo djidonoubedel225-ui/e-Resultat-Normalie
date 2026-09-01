@@ -1,4 +1,7 @@
-// --- CONFIGURATION SUPABASE ---
+// ==========================================
+// --- 1. CONFIGURATION & INITIALISATION ---
+// ==========================================
+
 const SUPABASE_URL = 'https://ecouwdvycrfrbljwoxwb.supabase.co';          
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVjb3V3ZHZ5Y3JmcmJsandveHdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxMDI1MjEsImV4cCI6MjEwMzY3ODUyMX0.su8A21HqeHdLCxVI6f94aTruboQ8m8AIetya0KDQcGY'; 
 
@@ -37,7 +40,7 @@ function obtenirCleSupabase() {
   return `${filiere} - ${promotion}`;
 }
 
-// Fonction utilitaire pour afficher les erreurs sans alert()
+// Fonction utilitaire pour afficher les erreurs sans alert() bloquant
 function afficherErreurMatricule(message) {
   const messageBox = document.getElementById('messageErreur');
   if (messageBox) {
@@ -51,14 +54,41 @@ function afficherErreurMatricule(message) {
   }
 }
 
-// --- INITIALISATION AU CHARGEMENT DE LA PAGE (Forçage strict de l'espace Étudiant par défaut) ---
-window.addEventListener('DOMContentLoaded', async () => {
-  if (typeof mettreAJourSemestres === 'function') {
-    mettreAJourSemestres();
-  }
+// Synchronisation dynamique de l'affichage des semestres selon le niveau BAPES sélectionné
+function mettreAJourSemestres() {
+  const anneeSelect = document.getElementById('anneeSelect');
+  const semestreSelect = document.getElementById('semestreSelect');
+  if (!anneeSelect || !semestreSelect) return;
 
-  // On force explicitement l'état initial sur le mode Étudiant au chargement/rafraîchissement
+  const niveauActuel = anneeSelect.value;
+  let premierSemestreVisible = null;
+
+  Array.from(semestreSelect.options).forEach(option => {
+    const niveauAssocie = option.getAttribute('data-niveau');
+    if (niveauAssocie === niveauActuel) {
+      option.style.display = 'block';
+      if (!premierSemestreVisible) {
+        premierSemestreVisible = option.value;
+      }
+    } else {
+      option.style.display = 'none';
+    }
+  });
+
+  const optionActuelle = semestreSelect.options[semestreSelect.selectedIndex];
+  if (optionActuelle && optionActuelle.getAttribute('data-niveau') !== niveauActuel) {
+    semestreSelect.value = premierSemestreVisible;
+  }
+}
+
+// --- ÉCOUTEUR GLOBAL DE CHARGEMENT ---
+window.addEventListener('DOMContentLoaded', async () => {
+  mettreAJourSemestres();
+
   currentMode = 'student';
+  const btnModeStudent = document.getElementById('btnModeStudent');
+  const btnAdminMode = document.getElementById('btnAdminMode');
+  
   if (btnModeStudent) btnModeStudent.classList.add('active-tab');
   if (btnAdminMode) btnAdminMode.classList.remove('active-tab');
   
@@ -67,6 +97,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   
   const adminPanelEl = document.getElementById('adminPanelContainer');
   if (adminPanelEl) adminPanelEl.style.display = 'none';
+
+  const studentSectionEl = document.getElementById('studentSection');
+  if (studentSectionEl) studentSectionEl.style.display = 'block';
   
   const saveChangesEl = document.getElementById('saveChangesBtn');
   if (saveChangesEl) saveChangesEl.style.display = 'none';
@@ -77,7 +110,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   afficherErreurMatricule('');
 });
 
-// --- 1. GESTION DES MODES (ÉTUDIANT / ADMIN) ---
+
+// ==========================================
+// --- 2. GESTION DES MODES & AUTHENTIFICATION ---
+// ==========================================
+
 const btnModeStudent = document.getElementById('btnModeStudent');
 if (btnModeStudent) {
   btnModeStudent.addEventListener('click', (e) => {
@@ -89,6 +126,7 @@ if (btnModeStudent) {
     
     document.getElementById('actionBtn').textContent = "Accédez à vos résultats";
     document.getElementById('adminPanelContainer').style.display = 'none';
+    document.getElementById('studentSection').style.display = 'block';
     document.getElementById('saveChangesBtn').style.display = 'none';
     document.getElementById('bulletinContainer').style.display = 'none';
     afficherErreurMatricule(''); 
@@ -105,7 +143,6 @@ const adminModalSubmit = document.getElementById('adminModalSubmit');
 
 if (btnAdminMode && adminModal) {
   btnAdminMode.addEventListener('click', async () => {
-    // Si l'utilisateur est déjà connecté en admin dans la session active, on bascule directement
     if (_supabase) {
       const { data: { session } } = await _supabase.auth.getSession();
       if (session) {
@@ -115,26 +152,44 @@ if (btnAdminMode && adminModal) {
     }
 
     adminModal.style.display = 'flex';
-    if (adminEmailInput && !adminEmailInput.value) adminEmailInput.value = "admin@bapes.bj";
+    if (adminEmailInput && !adminEmailInput.value.trim()) adminEmailInput.value = "admin@bapes.bj";
     if (adminKeyInput) adminKeyInput.value = '';
     if (adminModalError) adminModalError.style.display = 'none';
-    if (adminEmailInput) {
-      adminEmailInput.focus();
-    } else if (adminKeyInput) {
-      adminKeyInput.focus();
-    }
+    
+    if (adminEmailInput) adminEmailInput.focus();
   });
 }
 
-if (adminModalCancel) {
-  adminModalCancel.addEventListener('click', () => {
+// --- LOGIQUE ROBUSTE DE FERMETURE DES MODALES ---
+function fermerAdminModal() {
+  if (adminModal) {
     adminModal.style.display = 'none';
-    if (currentMode !== 'admin') {
-      if (btnModeStudent) btnModeStudent.classList.add('active-tab');
-      if (btnAdminMode) btnAdminMode.classList.remove('active-tab');
-    }
-  });
+  }
+  if (currentMode !== 'admin') {
+    if (btnModeStudent) btnModeStudent.classList.add('active-tab');
+    if (btnAdminMode) btnAdminMode.classList.remove('active-tab');
+  }
 }
+
+if (adminModalCancel) {
+  adminModalCancel.addEventListener('click', fermerAdminModal);
+}
+
+// Fermeture par clic en dehors de la fenêtre modale
+window.addEventListener('click', (event) => {
+  if (adminModal && event.target === adminModal) {
+    fermerAdminModal();
+  }
+});
+
+// Fermeture par la touche Échap (Escape)
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    if (adminModal && adminModal.style.display === 'flex') {
+      fermerAdminModal();
+    }
+  }
+});
 
 async function executerConnexionAdmin() {
   try {
@@ -169,6 +224,7 @@ function basculerModeAdminReussi() {
   
   document.getElementById('actionBtn').textContent = "Charger les notes de l'étudiant";
   document.getElementById('adminPanelContainer').style.display = 'block';
+  document.getElementById('studentSection').style.display = 'block';
   document.getElementById('saveChangesBtn').style.display = 'block';
   document.getElementById('bulletinContainer').style.display = 'none';
   afficherErreurMatricule('');
@@ -182,61 +238,40 @@ if (adminModalSubmit) {
   adminModalSubmit.addEventListener('click', executerConnexionAdmin);
 }
 
-// Gestion de la touche Entrée sur les champs du modal admin
 [adminEmailInput, adminKeyInput].forEach(input => {
   if (input) {
     input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        executerConnexionAdmin();
-      }
+      if (e.key === 'Enter') executerConnexionAdmin();
     });
   }
 });
 
-// --- GESTION DE LA DÉCONNEXION SÉCURISÉE (Corrigée et radicale) ---
+// Déconnexion sécurisée et nettoyage des sessions locales
 const btnDeconnexion = document.getElementById('btnDeconnexion');
 if (btnDeconnexion) {
   btnDeconnexion.addEventListener('click', async () => {
     try {
-      if (_supabase) {
-        await _supabase.auth.signOut();
-      }
+      if (_supabase) await _supabase.auth.signOut();
     } catch (err) {
-      console.error("Erreur lors de la déconnexion Supabase :", err);
+      console.error("Erreur déconnexion Supabase :", err);
     } finally {
-      // 1. Suppression ciblée de toutes les clés de session Supabase dans le localStorage
       Object.keys(localStorage).forEach(key => {
         if (key.includes('supabase.auth.token') || key.startsWith('sb-')) {
           localStorage.removeItem(key);
         }
       });
-      
-      // 2. Nettoyage global de sécurité du stockage de session
       sessionStorage.clear();
-
-      // 3. Forçage de la redirection/rechargement vers la racine propre
       currentMode = 'student';
       window.location.href = window.location.pathname; 
     }
   });
 }
 
-// Écouteurs de changement sur TOUS les sélecteurs de filtres
-['filiereSelect', 'promotionSelect', 'anneeSelect', 'semestreSelect'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('change', async () => {
-      await chargerDonneesDepuisSupabase();
-      if (currentMode === 'admin') {
-        chargerInterfaceAdmin();
-      }
-      document.getElementById('bulletinContainer').style.display = 'none';
-      afficherErreurMatricule('');
-    });
-  }
-});
 
-// --- 2. SYNCHRONISATION SUPABASE ---
+// ==========================================
+// --- 3. SYNCHRONISATION SUPABASE ---
+// ==========================================
+
 async function chargerDonneesDepuisSupabase() {
   if (!_supabase) return;
 
@@ -297,11 +332,7 @@ window.sauvegarderDonneesVersSupabase = async function() {
   }
 
   const cleFilierePromotion = obtenirCleSupabase();
-
-  const payload = {
-    filiere: cleFilierePromotion,
-    content: donneesActuelles
-  };
+  const payload = { filiere: cleFilierePromotion, content: donneesActuelles };
 
   try {
     const { error } = await _supabase
@@ -318,7 +349,35 @@ window.sauvegarderDonneesVersSupabase = async function() {
   }
 };
 
-// --- 3. GESTION DES ÉTUDIANTS ---
+// Écouteurs de changement de contexte (Filière, Promotion, Niveau, Semestre)
+['filiereSelect', 'promotionSelect', 'anneeSelect', 'semestreSelect'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('change', async () => {
+      if (id === 'anneeSelect') mettreAJourSemestres();
+      await chargerDonneesDepuisSupabase();
+      if (currentMode === 'admin') chargerInterfaceAdmin();
+      document.getElementById('bulletinContainer').style.display = 'none';
+      afficherErreurMatricule('');
+    });
+  }
+});
+
+const btnSauvegarderConfig = document.getElementById('btnSauvegarderConfig');
+if (btnSauvegarderConfig) {
+  btnSauvegarderConfig.addEventListener('click', window.sauvegarderDonneesVersSupabase);
+}
+
+const btnAjouterUE = document.getElementById('btnAjouterUE');
+if (btnAjouterUE) {
+  btnAjouterUE.addEventListener('click', window.ajouterUE);
+}
+
+
+// ==========================================
+// --- 4. GESTION DES ÉTUDIANTS (ADMIN) ---
+// ==========================================
+
 const addStudentBtn = document.getElementById('addStudentBtn');
 if (addStudentBtn) {
   addStudentBtn.addEventListener('click', async () => {
@@ -356,7 +415,6 @@ if (addStudentBtn) {
     });
     
     await sauvegarderDonneesVersSupabase();
-
     matriculeInput.value = '';
     nomInput.value = '';
     chargerListeEtudiantsAdmin();
@@ -377,6 +435,7 @@ function chargerListeEtudiantsAdmin() {
   donneesActuelles.etudiants.forEach((etudiant, index) => {
     const item = document.createElement('div');
     item.className = 'student-item-badge';
+    item.style.cssText = "display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.75rem; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 0.5rem;";
     item.innerHTML = `
       <span><strong>${etudiant.matricule}</strong> - ${etudiant.nom}</span>
       <div>
@@ -393,13 +452,11 @@ window.modifierEtudiant = async function(index) {
   const nouveauMatricule = prompt(`Modifier le matricule :`, etudiant.matricule);
   if (nouveauMatricule === null) return; 
   const matriculeNettoye = nouveauMatricule.trim();
-  
   if (!matriculeNettoye) return alert("Le matricule ne peut pas être vide.");
 
   const nouveauNom = prompt(`Modifier le nom et prénoms :`, etudiant.nom);
   if (nouveauNom === null) return; 
   const nomNettoye = nouveauNom.trim();
-  
   if (!nomNettoye) return alert("Le nom ne peut pas être vide.");
 
   donneesActuelles.etudiants[index].matricule = matriculeNettoye;
@@ -415,7 +472,11 @@ window.supprimerEtudiant = async function(index) {
   chargerListeEtudiantsAdmin();
 };
 
-// --- 4. MAQUETTE PÉDAGOGIQUE & CONTRÔLE DE PUBLICATION ---
+
+// ==========================================
+// --- 5. MAQUETTE PÉDAGOGIQUE & STATISTIQUES ---
+// ==========================================
+
 function chargerInterfaceAdmin() {
   chargerInterfaceBuilder();
   chargerListeEtudiantsAdmin();
@@ -431,12 +492,8 @@ function chargerInterfaceBuilder() {
   const annee = document.getElementById('anneeSelect').value;
   const semestre = document.getElementById('semestreSelect').value;
 
-  if (!donneesActuelles.structureUEParNiveau[annee]) {
-    donneesActuelles.structureUEParNiveau[annee] = {};
-  }
-  if (!donneesActuelles.structureUEParNiveau[annee][semestre]) {
-    donneesActuelles.structureUEParNiveau[annee][semestre] = [];
-  }
+  if (!donneesActuelles.structureUEParNiveau[annee]) donneesActuelles.structureUEParNiveau[annee] = {};
+  if (!donneesActuelles.structureUEParNiveau[annee][semestre]) donneesActuelles.structureUEParNiveau[annee][semestre] = [];
 
   if (!donneesActuelles.publicationSemestres) donneesActuelles.publicationSemestres = {};
   if (!donneesActuelles.publicationSemestres[annee]) donneesActuelles.publicationSemestres[annee] = {};
@@ -449,7 +506,7 @@ function chargerInterfaceBuilder() {
   publicationBox.innerHTML = `
     <div>
       <strong style="display:block; font-size:0.95rem; color:var(--primary);">Publication des résultats (${semestre} - ${annee})</strong>
-      <span style="font-size:0.8rem; color:var(--text-muted);">Cochez pour rendre les notes visibles aux étudiants. Décochez pour garder le secret.</span>
+      <span style="font-size:0.8rem; color:var(--text-muted);">Cochez pour rendre les notes visibles aux étudiants.</span>
     </div>
     <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600;">
       <input type="checkbox" id="checkboxPublicationSemestre" ${estPublie ? 'checked' : ''} style="width:18px; height:18px; cursor:pointer;">
@@ -460,9 +517,7 @@ function chargerInterfaceBuilder() {
 
   const checkboxPub = publicationBox.querySelector('#checkboxPublicationSemestre');
   checkboxPub.addEventListener('change', (e) => {
-    if (!donneesActuelles.publicationSemestres[annee]) {
-      donneesActuelles.publicationSemestres[annee] = {};
-    }
+    if (!donneesActuelles.publicationSemestres[annee]) donneesActuelles.publicationSemestres[annee] = {};
     donneesActuelles.publicationSemestres[annee][semestre] = e.target.checked;
   });
 
@@ -564,9 +619,7 @@ function capturerDonneesBuilderEnCours() {
       const nom = codeInput ? codeInput.value.trim() : "";
       const label = labelInput ? labelInput.value.trim() : "";
       
-      if(nom || label) {
-        ecs.push({ nom, label });
-      }
+      if(nom || label) ecs.push({ nom, label });
     });
 
     nouvelleStructure.push({ nomUE, libelle, credit, ecs });
@@ -622,9 +675,7 @@ function calculerEtAfficherStatistiquesAdmin() {
         let moyenneUE = ue.ecs.length > 0 ? sommeNotesUE / ue.ecs.length : 0;
         
         let estEnRattrapage = !!rattrapagesSemestre[ue.nomUE];
-        if (estEnRattrapage && moyenneUE > 12.00) {
-          moyenneUE = 12.00;
-        }
+        if (estEnRattrapage && moyenneUE > 12.00) moyenneUE = 12.00;
 
         if (moyenneUE >= 12) totalCreditsAcquis += ue.credit;
         totalWeightedScores += moyenneUE * ue.credit;
@@ -633,9 +684,7 @@ function calculerEtAfficherStatistiquesAdmin() {
       let moyenneSemestrielle = totalWeightedScores / totalSemestreCredits;
       sommeMoyennesClasse += moyenneSemestrielle;
 
-      if (totalCreditsAcquis >= 24) {
-        totalAdmis++;
-      }
+      if (totalCreditsAcquis >= 24) totalAdmis++;
     }
   });
 
@@ -659,9 +708,7 @@ function afficherOuMettreAJourBlocStats(stats) {
     statsContainer.style.cssText = "display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;";
     
     const adminPanel = document.getElementById('adminPanelContainer');
-    if (adminPanel) {
-      adminPanel.insertBefore(statsContainer, adminPanel.firstChild);
-    }
+    if (adminPanel) adminPanel.insertBefore(statsContainer, adminPanel.firstChild);
   }
 
   statsContainer.innerHTML = `
@@ -685,7 +732,11 @@ function supprimerBlocStatsIfExists() {
   if (statsContainer) statsContainer.remove();
 }
 
-// --- 5. CONSULTATION ÉTUDIANTE & FILTRE DE SÉCURITÉ ---
+
+// ==========================================
+// --- 6. CONSULTATION & BULLETIN ---
+// ==========================================
+
 const actionBtn = document.getElementById('actionBtn');
 if (actionBtn) {
   actionBtn.addEventListener('click', async () => {
@@ -713,7 +764,6 @@ if (actionBtn) {
 
     if (currentMode !== 'admin') {
       const estPublie = donneesActuelles.publicationSemestres?.[anneeKey]?.[semestreKey] === true;
-      
       if (!estPublie) {
         afficherErreurMatricule("Les résultats de ce semestre ne sont pas encore disponibles.");
         document.getElementById('bulletinContainer').style.display = 'none';
@@ -782,18 +832,17 @@ function afficherBulletin(nomFiliere, nomPromotion, annee, semestre, structureUE
     let sommeNotesUE = 0;
     let ecsRowsHTML = "";
 
-    ue.ecs.forEach((ec, index) => {
+    ue.ecs.forEach((ec) => {
       let noteActuelle = notesSemestre[ec.nom] !== undefined ? notesSemestre[ec.nom] : 0;
       sommeNotesUE += noteActuelle;
-      let ecNum = index + 1;
 
       if (currentMode === 'admin') {
         ecsRowsHTML += `
           <tr class="ec-row">
-            <td>- ${ec.label || ec.nom} (EC ${ecNum})</td>
+            <td>- ${ec.label || ec.nom} </td>
             <td class="text-center"></td>
             <td class="text-center">
-              <input type="number" step="0.01" min="0" max="20" class="input-note" data-ec="${ec.nom}" value="${noteActuelle}">
+              <input type="number" step="0.01" min="0" max="20" class="input-note" data-ec="${ec.nom}" value="${notesSemestre[ec.nom] !== undefined ? notesSemestre[ec.nom] : ''}" oninput="if(this.value > 20) { this.value = 0; } else if(this.value < 0) { this.value = 0; }">
             </td>
             <td></td>
             <td></td>
@@ -801,7 +850,7 @@ function afficherBulletin(nomFiliere, nomPromotion, annee, semestre, structureUE
       } else {
         ecsRowsHTML += `
           <tr class="ec-row">
-            <td>- ${ec.label || ec.nom} (EC ${ecNum})</td>
+            <td>- ${ec.label || ec.nom} </td>
             <td class="text-center"></td>
             <td class="text-center">${noteActuelle.toFixed(2)}</td>
             <td></td>
@@ -813,12 +862,9 @@ function afficherBulletin(nomFiliere, nomPromotion, annee, semestre, structureUE
     let moyenneUE = ue.ecs.length > 0 ? sommeNotesUE / ue.ecs.length : 0;
     
     let estEnRattrapage = !!rattrapagesSemestre[ue.nomUE];
-    if (estEnRattrapage && moyenneUE > 12.00) {
-      moyenneUE = 12.00;
-    }
+    if (estEnRattrapage && moyenneUE > 12.00) moyenneUE = 12.00;
 
     let estValide = moyenneUE >= 12;
-
     if (estValide) totalCreditsAcquired += ue.credit;
     totalWeightedScores += moyenneUE * ue.credit;
 
@@ -865,9 +911,6 @@ function afficherBulletin(nomFiliere, nomPromotion, annee, semestre, structureUE
   } else if (totalCreditsAcquired >= 24) {
     statutGlobalText = "VALIDÉ + R";
     statutClassStyle = "status-valide";
-  } else {
-    statutGlobalText = "NON VALIDÉ";
-    statutClassStyle = "status-non-valide";
   }
 
   document.getElementById('resCredits').textContent = totalCreditsAcquired;
@@ -897,33 +940,54 @@ if (saveChangesBtn) {
       if (!etudiant.notes) etudiant.notes = {};
       if (!etudiant.notes[anneeKey]) etudiant.notes[anneeKey] = {};
       if (!etudiant.notes[anneeKey][semestreKey]) etudiant.notes[anneeKey][semestreKey] = {};
-      
+
+      let toutesCasesVides = true;
+
       document.querySelectorAll('.input-note').forEach(input => {
         let ecNom = input.getAttribute('data-ec');
-        etudiant.notes[anneeKey][semestreKey][ecNom] = parseFloat(input.value) || 0;
+        let valeurTexte = input.value.trim();
+
+        if (valeurTexte !== "") {
+          toutesCasesVides = false;
+          let val = parseFloat(valeurTexte) || 0;
+          if (val > 20) val = 20;
+          if (val < 0) val = 0;
+          etudiant.notes[anneeKey][semestreKey][ecNom] = val;
+        } else {
+          delete etudiant.notes[anneeKey][semestreKey][ecNom];
+        }
       });
 
-      if (!etudiant.rattrapages) etudiant.rattrapages = {};
-      if (!etudiant.rattrapages[anneeKey]) etudiant.rattrapages[anneeKey] = {};
-      if (!etudiant.rattrapages[anneeKey][semestreKey]) etudiant.rattrapages[anneeKey][semestreKey] = {};
+      if (toutesCasesVides) {
+        etudiant.notes[anneeKey][semestreKey] = {};
+        if (etudiant.rattrapages?.[anneeKey]?.[semestreKey]) {
+          etudiant.rattrapages[anneeKey][semestreKey] = {};
+        }
+      } else {
+        if (!etudiant.rattrapages) etudiant.rattrapages = {};
+        if (!etudiant.rattrapages[anneeKey]) etudiant.rattrapages[anneeKey] = {};
+        if (!etudiant.rattrapages[anneeKey][semestreKey]) etudiant.rattrapages[anneeKey][semestreKey] = {};
 
-      document.querySelectorAll('.rattrapage-checkbox').forEach(checkbox => {
-        let ueNom = checkbox.getAttribute('data-ue');
-        etudiant.rattrapages[anneeKey][semestreKey][ueNom] = checkbox.checked;
-      });
+        document.querySelectorAll('.rattrapage-checkbox').forEach(checkbox => {
+          let ueNom = checkbox.getAttribute('data-ue');
+          etudiant.rattrapages[anneeKey][semestreKey][ueNom] = checkbox.checked;
+        });
+      }
 
       await sauvegarderDonneesVersSupabase();
       
       const filiereSelect = document.getElementById('filiereSelect');
       const filiereTexte = filiereSelect ? filiereSelect.options[filiereSelect.selectedIndex].text : "";
-      
       const promoSelect = document.getElementById('promotionSelect');
       const promoTexte = promoSelect ? promoSelect.options[promoSelect.selectedIndex].text : "";
-
       const structureSemestre = donneesActuelles.structureUEParNiveau[anneeKey][semestreKey];
       
       afficherBulletin(filiereTexte, promoTexte, anneeKey, semestreKey, structureSemestre, etudiant);
       calculerEtAfficherStatistiquesAdmin();
+
+      if (toutesCasesVides) {
+        alert("Toutes les notes étant vides, le bulletin de ce semestre a été réinitialisé.");
+      } 
     }
   });
 }
