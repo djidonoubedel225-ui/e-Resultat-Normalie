@@ -3,34 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>e-RESULTAT NORMALIEN</title>
+
+  <title>E-RESULTAT NORMALIEN | Plateforme Académique</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  >
+
   <style>
     :root {
       --primary: #1e3a8a;
       --primary-light: #3b82f6;
       --primary-hover: #1e40af;
+
       --bg-main: #f8fafc;
       --card-bg: #ffffff;
+
       --text-main: #1e293b;
       --text-muted: #64748b;
+
       --border: #e2e8f0;
+
       --success: #16a34a;
       --success-bg: #dcfce7;
+
       --danger: #dc2626;
       --danger-bg: #fee2e2;
+
       --warning-bg: #fef3c7;
       --warning-text: #d97706;
+
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+      --shadow-sm:
+        0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+      --shadow-md:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -2px rgba(0, 0, 0, 0.05);
+
+      --shadow-lg:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+      --transition:
+        all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     * {
@@ -52,12 +75,22 @@
       margin: 0 auto;
     }
 
-    /* En-tête, Logo & Bannière */
+    /* =========================================================
+       EN-TÊTE
+    ========================================================= */
+
     .app-header {
       text-align: center;
       margin-bottom: 1.5rem;
       padding: 1.75rem 1.25rem;
-      background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+
+      background:
+        linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #f1f5f9 100%
+        );
+
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
@@ -67,23 +100,36 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
       gap: 1rem;
       margin-bottom: 1rem;
     }
 
     .logo-icon {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      background:
+        linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--primary-light) 100%
+        );
+
       color: white;
       font-weight: 900;
       font-size: 1.25rem;
+
       width: 60px;
       height: 60px;
+
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       border-radius: var(--radius-md);
-      box-shadow: 0 6px 12px rgba(30, 58, 138, 0.25);
+
+      box-shadow:
+        0 6px 12px rgba(30, 58, 138, 0.25);
+
       letter-spacing: 0.5px;
     }
 
@@ -100,6 +146,8 @@
       color: var(--primary);
       font-weight: 800;
       line-height: 1.2;
+      margin-top:10px;
+      
     }
 
     .highlight-ern {
@@ -110,22 +158,25 @@
       font-size: 0.85rem;
       color: var(--text-muted);
       font-weight: 500;
-      display: block;
-      margin-top: 4px;
+
     }
 
     .welcome-banner {
       background: var(--card-bg);
+
       padding: 1rem;
+
       border-radius: 8px;
       border-left: 4px solid var(--primary);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.05);
     }
-      
+
     .welcome-banner h2 {
       font-size: 0.9rem;
       color: var(--text-main);
-      margin: 0 0 0.4rem 0;
+      margin-bottom: 0.4rem;
       font-weight: 700;
     }
 
@@ -136,28 +187,43 @@
       font-style: italic;
     }
 
-    /* Navigation Modes */
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
+
     .mode-selector {
       display: flex;
       gap: 0.5rem;
+
       margin-bottom: 1.5rem;
+
       background: #e2e8f0;
       padding: 4px;
+
       border-radius: var(--radius-sm);
     }
 
     .mode-btn {
       flex: 1;
+
       padding: 0.75rem 0.5rem;
+
       border: none;
       background: transparent;
+
       font-weight: 600;
       font-size: 0.9rem;
+
       color: var(--text-muted);
+
       cursor: pointer;
+
       border-radius: 6px;
+
       text-align: center;
+
       transition: var(--transition);
+
       line-height: 1.3;
     }
 
@@ -171,15 +237,27 @@
       box-shadow: var(--shadow-sm);
     }
 
-    /* Cartes & Formulaires */
+    /* =========================================================
+       CARTES
+    ========================================================= */
+
     .card {
       background: var(--card-bg);
+
       padding: 1.5rem;
+
       border-radius: var(--radius-lg);
+
       border: 1px solid var(--border);
+
       box-shadow: var(--shadow-md);
+
       margin-bottom: 1.5rem;
     }
+
+    /* =========================================================
+       FORMULAIRES
+    ========================================================= */
 
     .form-row {
       display: grid;
@@ -188,11 +266,15 @@
     }
 
     @media (max-width: 992px) {
-      .form-row { grid-template-columns: repeat(2, 1fr); }
+      .form-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     @media (max-width: 576px) {
-      .form-row { grid-template-columns: 1fr; }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
     }
 
     .form-group {
@@ -205,49 +287,79 @@
 
     .form-group label {
       display: block;
+
       font-weight: 600;
       font-size: 0.875rem;
+
       margin-bottom: 0.4rem;
+
       color: var(--text-main);
     }
 
-    select, input {
+    select,
+    input {
       width: 100%;
+
       padding: 0.75rem 1rem;
+
       border: 1px solid var(--border);
+
       border-radius: var(--radius-sm);
+
       font-size: 0.95rem;
+
       font-family: inherit;
+
       color: var(--text-main);
+
       background: #fff;
+
       transition: var(--transition);
+
       outline: none;
     }
 
-    select:focus, input:focus {
+    select:focus,
+    input:focus {
       border-color: var(--primary-light);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+
+      box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
     button {
       cursor: pointer;
+
       font-weight: 600;
+
       font-family: inherit;
+
       padding: 0.75rem 1.25rem;
+
       border-radius: var(--radius-sm);
+
       border: none;
+
       transition: var(--transition);
+
       display: inline-flex;
+
       align-items: center;
+
       justify-content: center;
+
       gap: 0.5rem;
     }
 
     .btn-primary {
       background: var(--primary);
+
       color: white;
+
       width: 100%;
-      box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2);
+
+      box-shadow:
+        0 2px 4px rgba(30, 58, 138, 0.2);
     }
 
     .btn-primary:hover {
@@ -266,7 +378,9 @@
     .btn-danger {
       background: var(--danger-bg);
       color: var(--danger);
+
       padding: 0.4rem 0.8rem;
+
       font-size: 0.85rem;
     }
 
@@ -274,23 +388,39 @@
       background: #fecaca;
     }
 
-    /* Message d'erreur intégré élégant */
+    /* =========================================================
+       MESSAGES
+    ========================================================= */
+
     .error-message {
       background-color: var(--danger-bg);
+
       color: var(--danger);
+
       border: 1px solid #fecaca;
+
       padding: 0.75rem 1rem;
+
       border-radius: var(--radius-sm);
+
       font-weight: 600;
+
       font-size: 0.875rem;
+
       margin-top: 0.75rem;
+
       display: none;
     }
 
-    /* Panneaux d'affichage */
+    /* =========================================================
+       PANNEAUX
+    ========================================================= */
+
     #adminPanelContainer {
       display: none;
+
       border: 2px dashed var(--primary);
+
       background: #fafafa;
     }
 
@@ -298,435 +428,1520 @@
       display: block;
     }
 
+    /* =========================================================
+       CONSTRUCTEUR UE / EC
+    ========================================================= */
+
     .ue-builder-card {
       background: white;
+
       border: 1px solid var(--border);
+
       padding: 1.25rem;
+
       border-radius: var(--radius-sm);
+
       margin-bottom: 1rem;
+
       box-shadow: var(--shadow-sm);
     }
 
     .ue-builder-header {
       display: flex;
+
       gap: 0.75rem;
+
       align-items: center;
+
       margin-bottom: 1rem;
+
       flex-wrap: wrap;
     }
 
     .ec-builder-row {
       display: flex;
+
       gap: 0.5rem;
+
       margin-bottom: 0.75rem;
+
       align-items: center;
+
       flex-wrap: wrap;
     }
 
-    .ec-builder-row .ec-code { width: 120px; flex-shrink: 0; }
-    .ec-builder-row .ec-label,
+    .ec-builder-row .ec-code {
+      width: 120px;
+      flex-shrink: 0;
+    }
+
+    .ec-builder-row .ec-label {
+      flex: 1;
+      min-width: 150px;
+    }
+
     #ueBuilderList input[type="text"]:nth-of-type(2) {
       flex: 1;
       min-width: 150px;
     }
 
-    /* Tableau Bulletin */
+    /* =========================================================
+       BULLETIN
+    ========================================================= */
+
     #bulletinContainer {
       display: none;
+
       margin-top: 1.5rem;
+
       border-top: 1px solid var(--border);
+
       padding-top: 1.25rem;
     }
 
     .bulletin-header-info {
       display: grid;
+
       grid-template-columns: repeat(2, 1fr);
+
       gap: 0.75rem;
+
       margin-bottom: 1.25rem;
+
       font-size: 0.95rem;
+
       background: #f8fafc;
+
       padding: 1rem;
+
       border-radius: var(--radius-sm);
+
       border: 1px solid var(--border);
     }
 
     @media (max-width: 600px) {
-      .bulletin-header-info { grid-template-columns: 1fr; }
+      .bulletin-header-info {
+        grid-template-columns: 1fr;
+      }
+
+      .bulletin-header-info > div {
+        grid-column: auto !important;
+      }
     }
+
+    /* =========================================================
+       TABLEAU ACADÉMIQUE
+    ========================================================= */
 
     .academic-table {
       width: 100%;
+
       border-collapse: collapse;
+
       margin-top: 1rem;
+
       background: white;
+
       font-size: 0.9rem;
+
       border-radius: var(--radius-sm);
+
       overflow: hidden;
+
       border: 1px solid var(--border);
     }
 
-    .academic-table th, .academic-table td {
+    .academic-table th,
+    .academic-table td {
       border: 1px solid var(--border);
+
       padding: 0.75rem;
     }
 
     .academic-table th {
       background: #f1f5f9;
+
       color: var(--text-main);
+
       font-weight: 700;
+
       text-align: left;
     }
 
-    .text-center { text-align: center; }
-    
+    .text-center {
+      text-align: center;
+    }
+
     .ue-row-header {
       background: #f8fafc;
+
       font-weight: 700;
+
       color: var(--primary);
     }
 
-    /* Status Badges */
-    .status-valide, .status-v {
-      background-color: var(--success-bg);
-      color: var(--success);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      display: inline-block;
-    }
-
-    .status-non-valide, .status-nv {
-      background-color: var(--danger-bg);
-      color: var(--danger);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      display: inline-block;
-    }
+    /* =========================================================
+       NOTES
+    ========================================================= */
 
     .input-note {
       width: 75px;
+
       padding: 6px;
+
       text-align: center;
+
       font-weight: 600;
     }
 
-    .rattrapage-container {
+    .input-note-rattrapage {
+      width: 85px;
+
+      padding: 6px;
+
+      text-align: center;
+
+      font-weight: 700;
+
+      border-color: #f59e0b;
+
+      background: #fffbeb;
+    }
+
+    .input-note-rattrapage:focus {
+      border-color: #d97706;
+
+      box-shadow:
+        0 0 0 3px rgba(217, 119, 6, 0.15);
+    }
+
+    /* =========================================================
+       RATTRAPAGE — NIVEAU EC
+    ========================================================= */
+
+    .ec-rattrapage-wrapper {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
+
+      flex-direction: column;
+
+      gap: 0.4rem;
+
+      margin-top: 0.45rem;
+
+      padding: 0.55rem 0.7rem;
+
       background: var(--warning-bg);
-      padding: 0.5rem 0.75rem;
+
       border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--warning-text);
-      margin-top: 0.5rem;
+
+      border: 1px solid #fde68a;
+
       width: fit-content;
+
+      min-width: 180px;
     }
 
-    .rattrapage-container input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+    .ec-rattrapage-checkbox-line {
+      display: flex;
+
+      align-items: center;
+
+      gap: 0.45rem;
+
+      color: var(--warning-text);
+
+      font-size: 0.78rem;
+
+      font-weight: 700;
+    }
+
+    .ec-rattrapage-checkbox {
+      width: 17px !important;
+      height: 17px;
+
+      margin: 0;
+
       cursor: pointer;
     }
 
+    .ec-rattrapage-checkbox:disabled {
+      cursor: not-allowed;
+
+      opacity: 0.5;
+    }
+
+    .ec-rattrapage-note-wrapper {
+      display: none;
+
+      align-items: center;
+
+      gap: 0.4rem;
+
+      font-size: 0.75rem;
+
+      color: var(--warning-text);
+    }
+
+    .ec-rattrapage-note-wrapper.active {
+      display: flex;
+    }
+
+    .rattrapage-help {
+      display: block;
+
+      color: var(--text-muted);
+
+      font-size: 0.7rem;
+
+      font-weight: 500;
+
+      margin-top: 0.1rem;
+    }
+
+    .rattrapage-locked {
+      background: #f1f5f9;
+
+      color: var(--text-muted);
+
+      border-color: var(--border);
+
+      opacity: 0.75;
+    }
+
+    .rattrapage-locked .ec-rattrapage-checkbox-line {
+      color: var(--text-muted);
+    }
+
+    /* Indication visuelle lorsqu'un EC est effectivement repris */
+    .ec-en-rattrapage {
+      background: #fffbeb;
+    }
+
+    .note-rattrapage-display {
+      color: var(--warning-text);
+
+      font-weight: 700;
+
+      font-size: 0.8rem;
+    }
+
+    .note-effective {
+      font-weight: 800;
+
+      color: var(--primary);
+    }
+
+    .rattrapage-badge {
+      display: inline-block;
+
+      margin-left: 4px;
+
+      padding: 2px 6px;
+
+      border-radius: 10px;
+
+      background: var(--warning-bg);
+
+      color: var(--warning-text);
+
+      font-size: 0.65rem;
+
+      font-weight: 800;
+
+      vertical-align: middle;
+    }
+
+    /* =========================================================
+       STATUTS
+    ========================================================= */
+
+    .status-valide,
+    .status-v {
+      background-color: var(--success-bg);
+
+      color: var(--success);
+
+      padding: 4px 10px;
+
+      border-radius: 20px;
+
+      font-weight: 700;
+
+      font-size: 0.8rem;
+
+      text-transform: uppercase;
+
+      display: inline-block;
+    }
+
+    .status-non-valide,
+    .status-nv {
+      background-color: var(--danger-bg);
+
+      color: var(--danger);
+
+      padding: 4px 10px;
+
+      border-radius: 20px;
+
+      font-weight: 700;
+
+      font-size: 0.8rem;
+
+      text-transform: uppercase;
+
+      display: inline-block;
+    }
+
+    /* =========================================================
+       FORMULAIRE ADMIN
+    ========================================================= */
+
     .admin-student-form-grid {
       display: grid;
+
       grid-template-columns: 1fr 2fr auto;
+
       gap: 1rem;
+
       align-items: flex-end;
     }
 
     @media (max-width: 768px) {
       .admin-student-form-grid {
         grid-template-columns: 1fr;
+
         align-items: stretch;
       }
     }
 
-    /* Modal Authentification Admin */
+    /* =========================================================
+       MODALE ADMIN
+    ========================================================= */
+
     #adminModal {
       display: none;
+
       position: fixed;
+
       inset: 0;
+
       background: rgba(15, 23, 42, 0.65);
+
       backdrop-filter: blur(5px);
+
       z-index: 1000;
+
       align-items: center;
+
       justify-content: center;
+
       padding: 1rem;
     }
 
     .modal-content {
       background: var(--card-bg);
+
       padding: 2rem;
+
       border-radius: var(--radius-lg);
+
       width: 100%;
+
       max-width: 420px;
+
       box-shadow: var(--shadow-lg);
+
       border: 1px solid var(--border);
+
       animation: modalSlideIn 0.3s ease-out;
     }
 
     @keyframes modalSlideIn {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
-    /* --- STYLES POUR LA MODALE PERSONNALISÉE (REMPLACEMENT DU PROMPT) --- */
+    /* =========================================================
+       MODALE MODIFICATION ETUDIANT
+    ========================================================= */
+
     .custom-modal-overlay {
       position: fixed;
+
       top: 0;
       left: 0;
+
       width: 100%;
       height: 100%;
+
       background: rgba(0, 0, 0, 0.5);
+
       backdrop-filter: blur(3px);
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       z-index: 9999;
+
       animation: fadeIn 0.2s ease-in-out;
     }
 
     .custom-modal-card {
       background: #fff;
+
       width: 90%;
+
       max-width: 400px;
+
       padding: 1.5rem;
+
       border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+      box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.15);
+
       animation: scaleUp 0.2s ease-in-out;
     }
 
     .custom-modal-header {
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       margin-bottom: 1rem;
     }
 
     .custom-modal-header h3 {
       font-size: 1rem;
-      color: var(--primary, #1e3a8a);
+
+      color: var(--primary);
+
       margin: 0;
     }
 
     .custom-modal-close {
       background: none;
+
       border: none;
+
       font-size: 1.5rem;
+
       cursor: pointer;
-      color: var(--text-muted, #64748b);
+
+      color: var(--text-muted);
+
+      padding: 0;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes scaleUp {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from {
+        transform: scale(0.95);
+
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+
+        opacity: 1;
+      }
+    }
+
+    /* =========================================================
+       RESPONSIVE BULLETIN
+    ========================================================= */
+
+    @media (max-width: 700px) {
+
+      .academic-table {
+        font-size: 0.78rem;
+      }
+
+      .academic-table th,
+      .academic-table td {
+        padding: 0.5rem;
+      }
+
+      .academic-table th:nth-child(1) {
+        width: 40%;
+      }
+
+      .input-note {
+        width: 65px;
+      }
+
+      .input-note-rattrapage {
+        width: 70px;
+      }
+
+      .ec-rattrapage-wrapper {
+        min-width: 150px;
+      }
+    }
+
+    @media (max-width: 500px) {
+
+      body {
+        padding: 0.75rem;
+      }
+
+      .card {
+        padding: 1rem;
+      }
+
+      .app-header {
+        padding: 1.25rem 0.75rem;
+      }
+
+      .logo-container {
+        flex-direction: right;
+      }
+
+      .logo-text h1 {
+        font-size: 1.1rem;
+      }
+
+      .mode-selector {
+        flex-direction: center;
+      }
+
+      .academic-table {
+        display: block;
+
+        overflow-x: auto;
+
+        white-space: nowrap;
+      }
+
+      .bulletin-header-info {
+        font-size: 0.82rem;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
-    
+
+    <!-- =======================================================
+         EN-TÊTE
+    ======================================================== -->
+
     <header class="app-header">
+
       <div class="logo-container">
+
         <div class="logo-icon">
           ERN
           <span>ENS</span>
         </div>
+
         <div class="logo-text">
-          <h1>E-RESULTAT <span class="highlight-ern">NORMALIEN</span></h1>
-          <span class="logo-tagline">Plateforme de Gestion Académique</span>
+
+          <h1>
+            E-RESULTAT
+            <span class="highlight-ern">NORMALIEN</span>
+          </h1>
+
+          <span class="logo-tagline">
+            Plateforme de Gestion Académique
+          </span>
+
         </div>
+
       </div>
-      
+
       <div class="welcome-banner">
-        <h2>BIENVENUE SUR LE E-RESULTAT NORMALIEN ✅</h2>
-        <p>Entrez vos informations et repartez avec vos résultats !</p>
+
+        <h2>
+          BIENVENUE SUR LE E-RESULTAT NORMALIEN ✅
+        </h2>
+
+        <p>
+          Entrez vos informations et repartez avec vos résultats !
+        </p>
+
       </div>
+
     </header>
 
+
+    <!-- =======================================================
+         SÉLECTEUR DE MODE
+    ======================================================== -->
+
     <div class="mode-selector">
-      <button type="button" id="btnModeStudent" class="mode-btn active-tab">Espace Étudiant / Consultation</button>
-      <button type="button" id="btnAdminMode" class="mode-btn">Espace Administration</button>
+
+      <button
+        type="button"
+        id="btnModeStudent"
+        class="mode-btn active-tab"
+      >
+        Espace Étudiant / Consultation
+      </button>
+
+      <button
+        type="button"
+        id="btnAdminMode"
+        class="mode-btn"
+      >
+        Espace Administration
+      </button>
+
     </div>
 
-    <!-- Filtres Académiques & Promotionnels -->
+
+    <!-- =======================================================
+         FILTRES ACADÉMIQUES
+    ======================================================== -->
+
     <div class="card">
+
       <div class="form-row">
+
         <div class="form-group">
-          <label for="filiereSelect">Filière</label>
+
+          <label for="filiereSelect">
+            Filière
+          </label>
+
           <select id="filiereSelect">
-            <option value="Allemand">Allemand</option>
-            <option value="Anglais">Anglais</option>
-            <option value="Espagnol">Espagnol</option>
-            <option value="Histoire-Géographie">Histoire-Géographie</option>
-            <option value="Lettres Modernes">Lettres Modernes</option>
-            <option value="Philosophie">Philosophie</option>
+
+            <option value="Allemand">
+              Allemand
+            </option>
+
+            <option value="Anglais">
+              Anglais
+            </option>
+
+            <option value="Espagnol">
+              Espagnol
+            </option>
+
+            <option value="Histoire-Géographie">
+              Histoire-Géographie
+            </option>
+
+            <option value="Lettres Modernes">
+              Lettres Modernes
+            </option>
+
+            <option value="Philosophie">
+              Philosophie
+            </option>
+
           </select>
+
         </div>
+
+
         <div class="form-group">
-          <label for="promotionSelect">Promotion</label>
+
+          <label for="promotionSelect">
+            Promotion
+          </label>
+
           <select id="promotionSelect">
-            <option value="15ème Promotion">15ème Promotion</option>
-            <option value="16ème Promotion">16ème Promotion</option>
-            <option value="17ème Promotion" selected>17ème Promotion</option>
+
+            <option value="15ème Promotion">
+              15ème Promotion
+            </option>
+
+            <option value="16ème Promotion">
+              16ème Promotion
+            </option>
+
+            <option value="17ème Promotion" selected>
+              17ème Promotion
+            </option>
+
           </select>
+
         </div>
+
+
         <div class="form-group">
-          <label for="anneeSelect">Niveau</label>
+
+          <label for="anneeSelect">
+            Niveau
+          </label>
+
           <select id="anneeSelect">
-            <option value="BAPES 1">BAPES 1</option>
-            <option value="BAPES 2">BAPES 2</option>
-            <option value="BAPES 3">BAPES 3</option>
+
+            <option value="BAPES 1">
+              BAPES 1
+            </option>
+
+            <option value="BAPES 2">
+              BAPES 2
+            </option>
+
+            <option value="BAPES 3">
+              BAPES 3
+            </option>
+
           </select>
+
         </div>
+
+
         <div class="form-group">
-          <label for="semestreSelect">Semestre</label>
+
+          <label for="semestreSelect">
+            Semestre
+          </label>
+
           <select id="semestreSelect">
-            <option value="Semestre 1" data-niveau="BAPES 1">Semestre 1</option>
-            <option value="Semestre 2" data-niveau="BAPES 1">Semestre 2</option>
-            <option value="Semestre 3" data-niveau="BAPES 2">Semestre 3</option>
-            <option value="Semestre 4" data-niveau="BAPES 2">Semestre 4</option>
-            <option value="Semestre 5" data-niveau="BAPES 3">Semestre 5</option>
-            <option value="Semestre 6" data-niveau="BAPES 3">Semestre 6</option>
+
+            <option
+              value="Semestre 1"
+              data-niveau="BAPES 1"
+            >
+              Semestre 1
+            </option>
+
+            <option
+              value="Semestre 2"
+              data-niveau="BAPES 1"
+            >
+              Semestre 2
+            </option>
+
+            <option
+              value="Semestre 3"
+              data-niveau="BAPES 2"
+            >
+              Semestre 3
+            </option>
+
+            <option
+              value="Semestre 4"
+              data-niveau="BAPES 2"
+            >
+              Semestre 4
+            </option>
+
+            <option
+              value="Semestre 5"
+              data-niveau="BAPES 3"
+            >
+              Semestre 5
+            </option>
+
+            <option
+              value="Semestre 6"
+              data-niveau="BAPES 3"
+            >
+              Semestre 6
+            </option>
+
           </select>
+
         </div>
+
       </div>
+
     </div>
 
-    <div id="studentSection" class="card">
-      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem; font-size: 1.15rem;">Consultez vos notes ici !</h3>
+
+    <!-- =======================================================
+         ESPACE ÉTUDIANT
+    ======================================================== -->
+
+    <div
+      id="studentSection"
+      class="card"
+    >
+
+      <h3
+        style="
+          margin-top:0;
+          color:var(--primary);
+          margin-bottom:1.25rem;
+          font-size:1.15rem;
+        "
+      >
+        Consultez vos notes ici !
+      </h3>
+
+
       <div class="form-group">
-        <label for="matriculeInput">Numéro Matricule :</label>
-        <input type="text" id="matriculeInput" placeholder="Entrez votre matricule (ex: 11910000)">
-        <div id="messageErreur" class="error-message"></div>
+
+        <label for="matriculeInput">
+          Numéro Matricule :
+        </label>
+
+        <input
+          type="text"
+          id="matriculeInput"
+          placeholder="Entrez votre matricule (ex: 11910000)"
+        >
+
+        <div
+          id="messageErreur"
+          class="error-message"
+        ></div>
+
       </div>
+
+
       <br>
-      <button type="button" id="actionBtn" class="btn-primary">Accédez à vos résultats</button>
+
+
+      <button
+        type="button"
+        id="actionBtn"
+        class="btn-primary"
+      >
+        Accédez à vos résultats
+      </button>
+
+
+      <!-- =====================================================
+           BULLETIN
+      ====================================================== -->
 
       <div id="bulletinContainer">
-        <h3 style="text-align: center; color: var(--primary); margin-bottom: 1.25rem;">BULLETIN DE NOTES</h3>
+
+        <h3
+          style="
+            text-align:center;
+            color:var(--primary);
+            margin-bottom:1.25rem;
+          "
+        >
+          BULLETIN DE NOTES
+        </h3>
+
+
+        <!-- INFORMATIONS ÉTUDIANT -->
+
         <div class="bulletin-header-info">
-          <div><strong>Filière :</strong> <span id="resFiliere"></span></div>
-          <div><strong>Niveau :</strong> <span id="resNiveau"></span></div>
-          <div><strong>Semestre :</strong> <span id="resSemestre"></span></div>
-          <div><strong>Matricule :</strong> <span id="resMatricule"></span></div>
-          <div style="grid-column: span 2;"><strong>Nom & Prénoms :</strong> <span id="resNom"></span></div>
+
+          <div>
+            <strong>Filière :</strong>
+            <span id="resFiliere"></span>
+          </div>
+
+          <div>
+            <strong>Niveau :</strong>
+            <span id="resNiveau"></span>
+          </div>
+
+          <div>
+            <strong>Semestre :</strong>
+            <span id="resSemestre"></span>
+          </div>
+
+          <div>
+            <strong>Matricule :</strong>
+            <span id="resMatricule"></span>
+          </div>
+
+          <div style="grid-column: span 2;">
+            <strong>Nom et Prénoms :</strong>
+            <span id="resNom"></span>
+          </div>
+
         </div>
+
+
+        <!--
+          Le JS construit ici toutes les UE et tous les EC.
+          
+          En mode étudiant :
+          - affichage de la note effective ;
+          - indication éventuelle du rattrapage.
+
+          En mode administration :
+          - note normale ;
+          - case rattrapage par EC ;
+          - note de rattrapage.
+        -->
 
         <div id="uesDynamicContainer"></div>
 
-        <div style="margin-top: 1.25rem; background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.95rem; display: grid; gap: 0.5rem;">
-          <div><strong>Crédits Acquis :</strong> <span id="resCredits">0</span> / 30</div>
-          <div><strong>Pourcentage validé :</strong> <span id="resPercentage">0%</span></div>
-          <div><strong>Moyenne Semestrielle :</strong> <span id="resSemestreAvg">0.00/20</span></div>
-          <div><strong>DÉCISION :</strong> <span id="resGlobalStatus">-</span></div>
+
+        <!-- ===================================================
+             SYNTHÈSE
+        ==================================================== -->
+
+        <div
+          style="
+            margin-top:1.25rem;
+            background:#f8fafc;
+            padding:1.25rem;
+            border-radius:var(--radius-sm);
+            border:1px solid var(--border);
+            font-size:0.95rem;
+            display:grid;
+            gap:0.5rem;
+          "
+        >
+
+          <div>
+            <strong>Crédits Acquis :</strong>
+
+            <span id="resCredits">
+              0
+            </span>
+
+            / 30
+          </div>
+
+
+          <div>
+            <strong>Pourcentage validé :</strong>
+
+            <span id="resPercentage">
+              0%
+            </span>
+          </div>
+
+
+          <div>
+            <strong>Moyenne Semestrielle :</strong>
+
+            <span id="resSemestreAvg">
+              0.00/20
+            </span>
+          </div>
+
+
+          <div>
+            <strong>DÉCISION :</strong>
+
+            <span id="resGlobalStatus">
+              -
+            </span>
+          </div>
+
         </div>
 
-        <button type="button" id="saveChangesBtn" class="btn-primary" style="background-color: var(--success); margin-top: 1.5rem; display: none;">Enregistrer les notes de l'étudiant</button>
+
+        <!-- ===================================================
+             ENREGISTREMENT ADMIN
+        ==================================================== -->
+
+        <button
+          type="button"
+          id="saveChangesBtn"
+          class="btn-primary"
+          style="
+            background-color:var(--success);
+            margin-top:1.5rem;
+            display:none;
+          "
+        >
+          Enregistrer les notes de l'étudiant
+        </button>
+
       </div>
+
     </div>
 
-    <div id="adminPanelContainer" class="card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
-        <h3 style="margin:0; color:var(--primary);">Configuration des Étudiants (Par Promotion)</h3>
-        <button type="button" id="btnDeconnexion" class="btn-danger" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Se déconnecter</button>
+
+    <!-- =======================================================
+         PANNEAU ADMINISTRATION
+    ======================================================== -->
+
+    <div
+      id="adminPanelContainer"
+      class="card"
+    >
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          margin-bottom:1.25rem;
+          gap:1rem;
+          flex-wrap:wrap;
+        "
+      >
+
+        <h3
+          style="
+            margin:0;
+            color:var(--primary);
+          "
+        >
+          Configuration des Étudiants (Par Promotion)
+        </h3>
+
+
+        <button
+          type="button"
+          id="btnDeconnexion"
+          class="btn-danger"
+          style="
+            font-size:0.8rem;
+            padding:0.4rem 0.8rem;
+          "
+        >
+          Se déconnecter
+        </button>
+
       </div>
-      
+
+
+      <!-- =====================================================
+           AJOUT ÉTUDIANT
+      ====================================================== -->
+
       <div class="admin-student-form-grid">
+
         <div class="form-group">
-          <label for="newMatricule">Matricule</label>
-          <input type="text" id="newMatricule" placeholder="Ex: 11910000">
+
+          <label for="newMatricule">
+            Matricule
+          </label>
+
+          <input
+            type="text"
+            id="newMatricule"
+            placeholder="Ex: 11910000"
+          >
+
         </div>
+
+
         <div class="form-group">
-          <label for="newNom">Nom et Prénoms</label>
-          <input type="text" id="newNom" placeholder="Identité de l'étudiant">
+
+          <label for="newNom">
+            Nom et Prénoms
+          </label>
+
+          <input
+            type="text"
+            id="newNom"
+            placeholder="Identité de l'étudiant"
+          >
+
         </div>
+
+
         <div class="form-group">
-          <button type="button" class="btn-primary" id="addStudentBtn">+ Ajouter l'Étudiant</button>
+
+          <button
+            type="button"
+            class="btn-primary"
+            id="addStudentBtn"
+          >
+            + Ajouter l'Étudiant
+          </button>
+
         </div>
+
       </div>
-      
-      <div id="adminStudentsList" style="margin-top: 1.5rem; margin-bottom: 2rem;"></div>
 
-      <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.75rem 0;">
 
-      <h3 style="margin-top:0; color:var(--primary); margin-bottom: 1.25rem;">Configuration de la Maquette Pédagogique (Par Semestre & Promotion)</h3>
+      <!-- LISTE DES ÉTUDIANTS -->
+
+      <div
+        id="adminStudentsList"
+        style="
+          margin-top:1.5rem;
+          margin-bottom:2rem;
+        "
+      ></div>
+
+
+      <hr
+        style="
+          border:0;
+          border-top:1px solid var(--border);
+          margin:1.75rem 0;
+        "
+      >
+
+
+      <!-- =====================================================
+           MAQUETTE PÉDAGOGIQUE
+      ====================================================== -->
+
+      <h3
+        style="
+          margin-top:0;
+          color:var(--primary);
+          margin-bottom:1.25rem;
+        "
+      >
+        Configuration de la Maquette Pédagogique
+        (Par Semestre & Promotion)
+      </h3>
+
+
       <div id="ueBuilderList"></div>
-      <button type="button" id="btnAjouterUE" class="btn-secondary">+ Ajouter une Unité d'Enseignement (UE)</button>
-      <br><br>
-      <button type="button" id="btnSauvegarderConfig" class="btn-primary">Enregistrer toute la configuration</button>
+
+
+      <button
+        type="button"
+        id="btnAjouterUE"
+        class="btn-secondary"
+      >
+        + Ajouter une Unité d'Enseignement (UE)
+      </button>
+
+
+      <br>
+      <br>
+
+
+      <button
+        type="button"
+        id="btnSauvegarderConfig"
+        class="btn-primary"
+      >
+        Enregistrer toute la configuration
+      </button>
+
     </div>
 
   </div>
 
-  <!-- MODALE D'AUTHENTIFICATION ADMIN -->
+
+  <!-- =========================================================
+       MODALE AUTHENTIFICATION ADMIN
+  ========================================================== -->
+
   <div id="adminModal">
+
     <div class="modal-content">
-      <div style="text-align: center; margin-bottom: 1.5rem;">
-        <div style="background: #e0e7ff; color: var(--primary); width: 52px; height: 52px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto; font-size: 1.5rem;">🔒</div>
-        <h3 style="margin: 0 0 0.4rem 0; color: var(--primary); font-size: 1.25rem;">Espace Administration</h3>
-        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Veuillez vous identifier :</p>
+
+      <div
+        style="
+          text-align:center;
+          margin-bottom:1.5rem;
+        "
+      >
+
+        <div
+          style="
+            background:#e0e7ff;
+            color:var(--primary);
+            width:52px;
+            height:52px;
+            border-radius:var(--radius-md);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin:0 auto 0.75rem auto;
+            font-size:1.5rem;
+          "
+        >
+          🔒
+        </div>
+
+
+        <h3
+          style="
+            margin:0 0 0.4rem 0;
+            color:var(--primary);
+            font-size:1.25rem;
+          "
+        >
+          Espace Administration
+        </h3>
+
+
+        <p
+          style="
+            margin:0;
+            color:var(--text-muted);
+            font-size:0.9rem;
+          "
+        >
+          Veuillez vous identifier :
+        </p>
+
       </div>
 
-      <div class="form-group" style="margin-bottom: 1rem;">
-        <label for="adminEmailInput" style="font-size: 0.8rem; margin-bottom: 0.25rem;">E-mail Admin</label>
-        <input type="email" id="adminEmailInput" placeholder="Entrez votre admin mail..." value=" ">
+
+      <div
+        class="form-group"
+        style="margin-bottom:1rem;"
+      >
+
+        <label
+          for="adminEmailInput"
+          style="
+            font-size:0.8rem;
+            margin-bottom:0.25rem;
+          "
+        >
+          E-mail Admin
+        </label>
+
+
+        <input
+          type="email"
+          id="adminEmailInput"
+          placeholder="Entrez votre admin mail..."
+          value=""
+        >
+
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label for="adminKeyInput" style="font-size: 0.8rem; margin-bottom: 0.25rem;">Mot de passe</label>
-        <input type="password" id="adminKeyInput" placeholder="Votre mot de passe...">
-        <div id="adminModalError" class="error-message" style="text-align: center; border: none; background: transparent; padding: 0;"></div>
+
+      <div
+        class="form-group"
+        style="margin-bottom:1.25rem;"
+      >
+
+        <label
+          for="adminKeyInput"
+          style="
+            font-size:0.8rem;
+            margin-bottom:0.25rem;
+          "
+        >
+          Mot de passe
+        </label>
+
+
+        <input
+          type="password"
+          id="adminKeyInput"
+          placeholder="Votre mot de passe..."
+        >
+
+
+        <div
+          id="adminModalError"
+          class="error-message"
+          style="
+            text-align:center;
+            border:none;
+            background:transparent;
+            padding:0;
+          "
+        ></div>
+
       </div>
 
-      <div style="display: flex; gap: 0.75rem;">
-        <button type="button" id="adminModalCancel" class="btn-secondary" style="flex: 1;">Annuler</button>
-        <button type="button" id="adminModalSubmit" class="btn-primary" style="flex: 1;">Valider</button>
+
+      <div
+        style="
+          display:flex;
+          gap:0.75rem;
+        "
+      >
+
+        <button
+          type="button"
+          id="adminModalCancel"
+          class="btn-secondary"
+          style="flex:1;"
+        >
+          Annuler
+        </button>
+
+
+        <button
+          type="button"
+          id="adminModalSubmit"
+          class="btn-primary"
+          style="flex:1;"
+        >
+          Valider
+        </button>
+
       </div>
+
     </div>
+
   </div>
 
-  <!-- MODALE PERSONNALISÉE POUR LA MODIFICATION D'UN ÉTUDIANT (Remplace prompt()) -->
-  <div id="customEditModal" class="custom-modal-overlay" style="display: none;">
+
+  <!-- =========================================================
+       MODALE MODIFICATION ÉTUDIANT
+  ========================================================== -->
+
+  <div
+    id="customEditModal"
+    class="custom-modal-overlay"
+    style="display:none;"
+  >
+
     <div class="custom-modal-card">
+
       <div class="custom-modal-header">
-        <h3>Modifier les informations de l'étudiant</h3>
-        <button type="button" class="custom-modal-close" id="closeEditModalBtn">&times;</button>
+
+        <h3>
+          Modifier les informations de l'étudiant
+        </h3>
+
+
+        <button
+          type="button"
+          class="custom-modal-close"
+          id="closeEditModalBtn"
+        >
+          &times;
+        </button>
+
       </div>
+
+
       <div class="custom-modal-body">
-        <div class="form-group" style="margin-bottom: 1rem;">
-          <label for="editModalMatricule" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Matricule :</label>
-          <input type="text" id="editModalMatricule" class="form-control" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px;">
+
+        <div
+          class="form-group"
+          style="margin-bottom:1rem;"
+        >
+
+          <label
+            for="editModalMatricule"
+            style="
+              display:block;
+              font-size:0.85rem;
+              font-weight:600;
+              margin-bottom:0.4rem;
+            "
+          >
+            Matricule :
+          </label>
+
+
+          <input
+            type="text"
+            id="editModalMatricule"
+            class="form-control"
+            style="
+              width:100%;
+              padding:0.6rem;
+              border:1px solid var(--border);
+              border-radius:6px;
+            "
+          >
+
         </div>
+
+
         <div class="form-group">
-          <label for="editModalNom" style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:0.4rem;">Nom et Prénoms :</label>
-          <input type="text" id="editModalNom" class="form-control" style="width:100%; padding:0.6rem; border:1px solid var(--border); border-radius:6px;">
+
+          <label
+            for="editModalNom"
+            style="
+              display:block;
+              font-size:0.85rem;
+              font-weight:600;
+              margin-bottom:0.4rem;
+            "
+          >
+            Nom et Prénoms :
+          </label>
+
+
+          <input
+            type="text"
+            id="editModalNom"
+            class="form-control"
+            style="
+              width:100%;
+              padding:0.6rem;
+              border:1px solid var(--border);
+              border-radius:6px;
+            "
+          >
+
         </div>
-        <div id="customModalError" style="color: #dc2626; font-size: 0.8rem; margin-top: 0.5rem; display: none;"></div>
+
+
+        <div
+          id="customModalError"
+          style="
+            color:#dc2626;
+            font-size:0.8rem;
+            margin-top:0.5rem;
+            display:none;
+          "
+        ></div>
+
       </div>
-      <div class="custom-modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem;">
-        <button type="button" class="btn-secondary" id="cancelEditModalBtn" style="padding: 0.5rem 1rem;">Annuler</button>
-        <button type="button" class="btn-primary" id="saveEditModalBtn" style="padding: 0.5rem 1rem;">Enregistrer</button>
+
+
+      <div
+        class="custom-modal-footer"
+        style="
+          display:flex;
+          justify-content:flex-end;
+          gap:10px;
+          margin-top:1.5rem;
+        "
+      >
+
+        <button
+          type="button"
+          class="btn-secondary"
+          id="cancelEditModalBtn"
+          style="
+            padding:0.5rem 1rem;
+          "
+        >
+          Annuler
+        </button>
+
+
+        <button
+          type="button"
+          class="btn-primary"
+          id="saveEditModalBtn"
+          style="
+            padding:0.5rem 1rem;
+          "
+        >
+          Enregistrer
+        </button>
+
       </div>
+
     </div>
+
   </div>
 
-  <!-- Scripts externes -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- =========================================================
+       SUPABASE
+  ========================================================== -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+
+  <!-- =========================================================
+       JAVASCRIPT PRINCIPAL
+  ========================================================== -->
+
   <script src="main.js"></script>
+
 </body>
 </html>
